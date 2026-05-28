@@ -38,8 +38,5 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-pl
 # Permisos para las carpetas de almacenamiento de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Limpiar configuración, rutas y vistas cacheadas
-RUN php artisan config:clear && php artisan cache:clear
-
 # Puerto expuesto por Render
 EXPOSE 80
