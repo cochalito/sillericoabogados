@@ -1,7 +1,7 @@
 # Usamos una imagen oficial de PHP con Apache
 FROM php:8.2-apache
 
-# Instalar dependencias del sistema y extensiones de PHP necesarias para Laravel
+# Instalar dependencias del sistema, extensiones de PHP y Node.js para Vite
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    curl
+    curl \
+    && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
 
 # Limpiar caché
 RUN apt-get clean && rm -rf /var/lib/lists/*
@@ -34,6 +36,9 @@ COPY . .
 
 # Instalar dependencias de Composer (Backend)
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
+
+# Instalar dependencias de NPM y compilar assets (Frontend con Vite)
+RUN npm install && npm run build
 
 # Permisos para las carpetas de almacenamiento de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
