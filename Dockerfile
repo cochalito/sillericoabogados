@@ -33,7 +33,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Instalar dependencias de Composer (Backend)
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
 # Permisos para las carpetas de almacenamiento de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
