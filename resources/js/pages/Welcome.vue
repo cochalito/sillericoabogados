@@ -240,7 +240,7 @@ const galleryImages = [
 </script>
 
 <template>
-  <Head title="Sillerico & Asociados - Firma de Abogados">
+  <Head title="Sillerico & Abogados - Firma de Abogados">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -257,7 +257,7 @@ const galleryImages = [
           <img 
             id="header-logo-box" 
             src="/images/logo-splash.png" 
-            alt="Sillerico & Asociados" 
+            alt="Sillerico & Abogados" 
             class="h-32 w-32 md:h-40 md:w-40 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] relative -mt-3 -mb-12 md:-mt-5 md:-mb-16"
           />
         </a>
@@ -319,7 +319,7 @@ const galleryImages = [
               </a>
             </nav>
             <div class="lg:hidden text-amber-100/80 font-['Cinzel',serif] text-sm font-bold tracking-wider">
-              SILLERICO & ASOCIADOS
+              SILLERICO & ABOGADOS
             </div>
 
             <!-- Botones de Acción -->
@@ -360,7 +360,7 @@ const galleryImages = [
           </h1>
 
           <p class="text-base md:text-lg text-neutral-300 dark:text-neutral-300 max-w-xl leading-relaxed font-light animate-on-reveal delay-400">
-            En <span class="font-semibold text-white dark:text-white">Sillerico & Asociados</span> fusionamos la tradición del derecho de excelencia con un enfoque moderno y ágil para asegurar el éxito patrimonial y corporativo de nuestros distinguidos clientes.
+            En <span class="font-semibold text-white dark:text-white">Sillerico & Abogados</span> fusionamos la tradición del derecho de excelencia con un enfoque moderno y ágil para asegurar el éxito patrimonial y corporativo de nuestros distinguidos clientes.
           </p>
 
           <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2 animate-on-reveal delay-500">
@@ -434,7 +434,7 @@ const galleryImages = [
                 LIDERAZGO JURÍDICO
               </span>
               <span class="text-[9px] text-[#c5a059] uppercase tracking-widest">
-                Sillerico & Asociados
+                Sillerico & Abogados
               </span>
             </div>
             
@@ -726,7 +726,7 @@ const galleryImages = [
           <div class="space-y-3">
             <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Trayectoria y Liderazgo</span>
             <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
-              Sobre Sillerico & Asociados
+              Sobre Sillerico & Abogados
             </h2>
             <div class="w-16 h-[2px] bg-[#c5a059]"></div>
           </div>
@@ -790,7 +790,7 @@ const galleryImages = [
           </div>
 
           <div class="mt-8 pt-6 border-t border-white/10 z-10 flex justify-between items-center text-xs text-neutral-300">
-            <span>S&A • SILLERICO & ASOCIADOS</span>
+            <span>S&A • SILLERICO & ABOGADOS</span>
             <Scale class="w-4 h-4 text-[#c5a059]" />
           </div>
         </div>
@@ -806,10 +806,10 @@ const galleryImages = [
           <div class="flex items-center gap-2.5">
             <img 
               src="/images/logo-splash.png" 
-              alt="Sillerico & Asociados" 
+              alt="Sillerico & Abogados" 
               class="h-8 w-8 object-contain"
             />
-            <span class="font-['Cinzel',serif] text-base font-bold tracking-wider text-[#c5a059]">SILLERICO & ASOCIADOS</span>
+            <span class="font-['Cinzel',serif] text-base font-bold tracking-wider text-[#c5a059]">SILLERICO & ABOGADOS</span>
           </div>
           
           <p class="text-neutral-400 font-light leading-relaxed">
@@ -891,7 +891,7 @@ const galleryImages = [
       </div>
 
       <div class="max-w-7xl mx-auto px-4 md:px-8 pt-8 border-t border-neutral-800 text-center text-neutral-500 text-[10px] md:text-xs flex flex-col sm:flex-row justify-between items-center gap-4">
-        <span>© 2026 Sillerico & Asociados. Todos los derechos reservados.</span>
+        <span>© 2026 Sillerico & Abogados. Todos los derechos reservados.</span>
         <span>Diseñado con Excelencia y Rigor Académico Jurídico.</span>
       </div>
     </footer>
@@ -979,7 +979,7 @@ const galleryImages = [
             ✓
           </div>
           <h4 class="font-['Cinzel',serif] text-base font-bold text-neutral-800 dark:text-[#c5a059]">¡Solicitud Recibida!</h4>
-          <p class="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto font-light">Un asesor legal de Sillerico & Asociados se contactará contigo por teléfono o WhatsApp de forma inmediata.</p>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto font-light">Un asesor legal de Sillerico & Abogados se contactará contigo por teléfono o WhatsApp de forma inmediata.</p>
         </div>
       </div>
     </div>
