@@ -31,4 +31,11 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+    build: {
+        rolldownOptions: {
+            checks: {
+                invalidAnnotation: false,
+            },
+        },
+    },
 });
