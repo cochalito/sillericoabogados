@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
+        {{-- Inline script to detect system dark mode preference and apply splash screen pending state immediately --}}
         <script>
             (function() {
                 const appearance = '{{ $appearance ?? "system" }}';
@@ -16,6 +16,13 @@
                         document.documentElement.classList.add('dark');
                     }
                 }
+
+                // Check if splash screen is pending for this session
+                try {
+                    if (!window.sessionStorage.getItem('sa_splash_shown')) {
+                        document.documentElement.classList.add('splash-pending');
+                    }
+                } catch (e) {}
             })();
         </script>
 
@@ -28,10 +35,21 @@
             html.dark {
                 background-color: oklch(0.145 0 0);
             }
+
+            /* Prevent initial flash of content when splash screen is pending */
+            html.splash-pending {
+                background-color: #082a20 !important;
+                overflow: hidden;
+            }
+
+            html.splash-pending #app {
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
         </style>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="/favicon.png" type="image/png">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         @fonts

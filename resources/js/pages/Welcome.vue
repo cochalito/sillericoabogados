@@ -1,15 +1,50 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
-import { useAppearance } from '@/composables/useAppearance';
 import { 
   Sun, Moon, Monitor, Phone, MessageSquare, MapPin, 
   ChevronRight, Search, FileText, Scale, Users, Image as ImageIcon, 
-  Info, ExternalLink, Mail, Check, Star, ArrowUpRight
+  Info, ExternalLink, Mail, Check, Star, ArrowUpRight,
+  Facebook, Youtube, Twitter
 } from 'lucide-vue-next';
+import { ref, computed, onMounted } from 'vue';
+import SplashScreen from '@/components/SplashScreen.vue';
+import { useAppearance } from '@/composables/useAppearance';
+
 
 // Use standard Laravel appearance manager
 const { appearance, updateAppearance, resolvedAppearance } = useAppearance();
+
+// Splash intro: show only on first visit per session
+const showSplash = ref(false);
+
+onMounted(() => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    const key = 'sa_splash_shown';
+
+    try {
+        if (!window.sessionStorage.getItem(key)) {
+            showSplash.value = true;
+            window.sessionStorage.setItem(key, '1');
+        } else {
+            document.documentElement.classList.remove('splash-pending');
+        }
+    } catch {
+        showSplash.value = true;
+    }
+});
+
+const handleSplashReveal = () => {
+    if (typeof window !== 'undefined') {
+        document.documentElement.classList.remove('splash-pending');
+    }
+};
+
+const handleSplashFinish = () => {
+    showSplash.value = false;
+};
 
 // State for Article/Laws Filter
 const searchKeyword = ref('');
@@ -52,9 +87,9 @@ const menuItems = [
 ];
 
 const contactLinks = {
-  whatsapp: 'https://wa.me/59170000000', // Mock standard WhatsApp
+  whatsapp: 'https://wa.me/59177234317', // WhatsApp direct link
   facebook: 'https://facebook.com/sillericoasociados',
-  phones: ['+591 2 2443020', '+591 706 12345'],
+  phones: ['+591 77234317', '+591 2 2443020'],
   emails: ['contacto@sillericoasociados.com', 'info@sillericoasociados.com'],
   address: 'Av. Mariscal Santa Cruz, Edificio Hansa, Piso 12, La Paz, Bolivia',
   locationUrl: 'https://maps.google.com/?q=Edificio+Hansa+La+Paz'
@@ -211,152 +246,158 @@ const galleryImages = [
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   </Head>
 
-  <div class="min-h-screen font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-300 bg-[#fbf9f6] text-neutral-800 dark:bg-[#060f12] dark:text-neutral-100">
+  <div class="min-h-screen font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-300 bg-[#082a20] text-amber-100/90 dark:bg-[#041510] dark:text-amber-100/90">
     
-    <!-- 1. BARRA DE ENLACES DE CONTACTO RÁPIDO (HEADER SUPERIOR) -->
-    <div class="w-full bg-[#082a20] text-amber-200/90 dark:bg-[#031510] border-b border-[#c5a059]/20 text-xs py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-2">
-      <div class="flex items-center gap-4">
-        <a :href="'tel:' + contactLinks.phones[0]" class="flex items-center gap-1.5 hover:text-white transition-colors">
-          <Phone class="w-3.5 h-3.5" />
-          <span>{{ contactLinks.phones[0] }}</span>
-        </a>
-        <a :href="contactLinks.locationUrl" target="_blank" class="flex items-center gap-1.5 hover:text-white transition-colors">
-          <MapPin class="w-3.5 h-3.5" />
-          <span>La Paz, Bolivia</span>
-        </a>
-      </div>
-      <div class="flex items-center gap-4">
-        <a :href="contactLinks.whatsapp" target="_blank" class="flex items-center gap-1.5 bg-emerald-700/40 hover:bg-emerald-700/60 px-2.5 py-0.5 rounded border border-emerald-500/30 text-white transition-all">
-          <MessageSquare class="w-3 h-3 text-emerald-400 fill-emerald-400" />
-          <span>WhatsApp Directo</span>
-        </a>
-        <a :href="contactLinks.facebook" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
-          <span>Facebook</span>
-          <ArrowUpRight class="w-2.5 h-2.5" />
-        </a>
-      </div>
-    </div>
-
-    <!-- 2. CABECERA PRINCIPAL Y NAVEGACIÓN (GLASSMORPHIC HEADER) -->
-    <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#fbf9f6]/80 dark:bg-[#060f12]/80 border-b border-neutral-200/50 dark:border-neutral-800/50 shadow-sm transition-all duration-300">
-      <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
+    <!-- CABECERA INTEGRADA EN DOS NIVELES (GLASSMORPHIC) -->
+    <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#082a20]/95 dark:bg-[#031510]/95 border-b border-[#c5a059]/20 shadow-lg transition-all duration-300 animate-fade-in">
+      <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex items-center gap-4 md:gap-8">
         
-        <!-- Logotipo S&A -->
-        <a href="#" class="flex items-center gap-2.5 group">
-          <div class="relative flex aspect-square size-10 items-center justify-center rounded-lg bg-[#082a20] dark:bg-[#0c3e30] border border-[#c5a059]/40 group-hover:scale-105 transition-transform">
-            <span class="font-['Cinzel',serif] font-bold text-base text-[#c5a059]">S&A</span>
-            <!-- Decorative wreath/scales subtle outline -->
-            <div class="absolute inset-0.5 rounded border border-amber-500/20"></div>
-          </div>
-          <div class="flex flex-col">
-            <span class="font-['Cinzel',serif] text-base md:text-lg font-bold tracking-wider leading-none text-[#082a20] dark:text-[#c5a059] group-hover:text-amber-600 transition-colors">
-              SILLERICO & ASOCIADOS
-            </span>
-            <span class="text-[9px] uppercase tracking-widest font-semibold text-neutral-500 dark:text-[#c5a059]/70">
-              Firma de Abogados
-            </span>
-          </div>
+        <!-- Logotipo S&A (Gold circular emblem spanning both levels - enlarged and overlapping in flow) -->
+        <a href="#" class="flex-shrink-0 group relative z-10">
+          <img 
+            id="header-logo-box" 
+            src="/images/logo-splash.png" 
+            alt="Sillerico & Asociados" 
+            class="h-32 w-32 md:h-40 md:w-40 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] relative -mt-3 -mb-12 md:-mt-5 md:-mb-16"
+          />
         </a>
 
-        <!-- Menú de Navegación de Escritorio -->
-        <nav class="hidden lg:flex items-center gap-6">
-          <a 
-            v-for="item in menuItems" 
-            :key="item.label" 
-            :href="item.href"
-            class="text-xs md:text-sm font-medium hover:text-[#c5a059] transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#c5a059] hover:after:w-full after:transition-all"
-          >
-            {{ item.label }}
-          </a>
-        </nav>
-
-        <!-- Botones de Acción (Theme Toggle y Contacto) -->
-        <div class="flex items-center gap-3">
+        <!-- Contenedor del menú en dos niveles -->
+        <div class="flex-1 flex flex-col justify-between py-1 min-h-[64px] md:min-h-[80px]">
           
-          <!-- Botón de Modo Oscuro/Claro (Inertia useAppearance) -->
-          <div class="flex items-center bg-neutral-200/50 dark:bg-neutral-800/50 p-1 rounded-lg border border-neutral-300/30 dark:border-neutral-700/30">
-            <button 
-              @click="updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')" 
-              class="p-1.5 rounded-md hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-all text-neutral-700 dark:text-neutral-200"
-              title="Cambiar Tema"
-            >
-              <Sun v-if="resolvedAppearance === 'dark'" class="w-4 h-4 text-amber-400" />
-              <Moon v-else class="w-4 h-4 text-emerald-950" />
-            </button>
+          <!-- Nivel 1: Enlaces y Redes Sociales (Facebook, WhatsApp, YouTube, X, Teléfono - Alineados a la derecha, estilo Linktree) -->
+          <div class="flex items-center justify-end border-b border-[#c5a059]/15 pb-2.5 mb-2 text-xs text-amber-200/80 gap-4 flex-wrap">
+            
+            <!-- Iconos de Contacto y Redes Sociales (Estilo Linktree burbujas con escala en hover) -->
+            <div class="flex items-center gap-2">
+              <!-- Teléfono con icono clicable para llamadas (Burbuja Gold estilo Linktree) -->
+              <a :href="'tel:' + contactLinks.phones[0].replace(/\s+/g, '')" class="w-8 h-8 rounded-full bg-[#c5a059] flex items-center justify-center text-[#082a20] transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="Llamar">
+                <Phone class="w-4 h-4" />
+              </a>
+
+              <!-- WhatsApp (Burbuja Verde) -->
+              <a :href="contactLinks.whatsapp" target="_blank" class="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="WhatsApp">
+                <svg class="w-4 h-4 fill-white" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                </svg>
+              </a>
+
+              <!-- Facebook -->
+              <a :href="contactLinks.facebook" target="_blank" class="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="Facebook">
+                <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </a>
+
+              <!-- YouTube -->
+              <a href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-full bg-[#FF0000] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="YouTube">
+                <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.507 9.386.507 9.386.507s7.516 0 9.387-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+              </a>
+
+              <!-- X (Twitter) -->
+              <a href="https://x.com" target="_blank" class="w-8 h-8 rounded-full bg-[#14171A] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="X (Twitter)">
+                <svg class="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+            </div>
           </div>
 
-          <!-- Botón de Consulta -->
-          <button 
-            @click="isContactModalOpen = true"
-            class="hidden sm:inline-flex items-center gap-1.5 bg-[#082a20] hover:bg-[#0c3e30] dark:bg-[#c5a059] dark:hover:bg-[#d6b46c] text-white dark:text-emerald-950 font-semibold px-4.5 py-2 rounded-lg text-xs md:text-sm tracking-wider border border-[#c5a059]/30 transition-all shadow-md active:scale-95"
-          >
-            <span>Consulta Rápida</span>
-            <ChevronRight class="w-3.5 h-3.5" />
-          </button>
+          <!-- Nivel 2: Menús del Sistema y Botones de Acción -->
+          <div class="flex items-center justify-between">
+            <!-- Navigation Links -->
+            <nav class="hidden lg:flex items-center gap-6">
+              <a 
+                v-for="item in menuItems" 
+                :key="item.label" 
+                :href="item.href"
+                class="text-xs md:text-sm font-['Cinzel',serif] font-bold tracking-wider text-amber-100/90 hover:text-[#c5a059] transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#c5a059] hover:after:w-full after:transition-all"
+              >
+                {{ item.label }}
+              </a>
+            </nav>
+            <div class="lg:hidden text-amber-100/80 font-['Cinzel',serif] text-sm font-bold tracking-wider">
+              SILLERICO & ASOCIADOS
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center gap-3">
+              <!-- Consulta Rápida -->
+              <button 
+                @click="isContactModalOpen = true"
+                class="bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-3 py-1.5 rounded border border-[#c5a059]/30 transition-all text-xs tracking-wider active:scale-95 flex items-center gap-1"
+              >
+                <span>Consulta Rápida</span>
+                <ChevronRight class="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </header>
 
     <!-- 3. SECCIÓN HERO PRINCIPAL (PREMIUM PRESENTATION) -->
-    <section class="relative w-full overflow-hidden py-20 lg:py-32 flex items-center justify-center bg-gradient-to-br from-[#f8f5ee] via-[#fbf9f6] to-[#eae5da] dark:from-[#050e10] dark:via-[#061517] dark:to-[#020708] border-b border-[#c5a059]/10">
+    <section class="relative w-full overflow-hidden py-20 lg:py-32 flex items-center justify-center bg-gradient-to-br from-[#082a20] via-[#051f18] to-[#041510] border-b border-[#c5a059]/10">
       
       <!-- Subtle Decorative Background Circles -->
       <div class="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none"></div>
       <div class="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl pointer-events-none"></div>
       
       <div class="max-w-7xl mx-auto px-4 md:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        
         <!-- Hero Text -->
         <div class="lg:col-span-7 flex flex-col items-start text-left space-y-6">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#082a20]/5 dark:bg-[#c5a059]/10 border border-[#082a20]/10 dark:border-[#c5a059]/20 text-xs font-semibold text-[#082a20] dark:text-[#c5a059]">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-[#c5a059]/20 text-xs font-semibold text-amber-200/90 animate-on-reveal delay-200">
             <Scale class="w-3.5 h-3.5" />
             <span>Firma de Abogados Elite - La Paz, Bolivia</span>
           </div>
 
-          <h1 class="font-['Cinzel',serif] text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#082a20] dark:text-[#c5a059] leading-[1.1] md:leading-[1.05]">
+          <h1 class="font-['Cinzel',serif] text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#c5a059] leading-[1.1] md:leading-[1.05] animate-on-reveal delay-300">
             Compromiso Inquebrantable, <br class="hidden sm:inline" />
-            <span class="text-neutral-800 dark:text-white">Excelencia Legal.</span>
+            <span class="text-neutral-100 dark:text-white">Excelencia Legal.</span>
           </h1>
 
-          <p class="text-base md:text-lg text-neutral-600 dark:text-neutral-300 max-w-xl leading-relaxed font-light">
-            En <span class="font-semibold text-neutral-800 dark:text-white">Sillerico & Asociados</span> fusionamos la tradición del derecho de excelencia con un enfoque moderno y ágil para asegurar el éxito patrimonial y corporativo de nuestros distinguidos clientes.
+          <p class="text-base md:text-lg text-neutral-300 dark:text-neutral-300 max-w-xl leading-relaxed font-light animate-on-reveal delay-400">
+            En <span class="font-semibold text-white dark:text-white">Sillerico & Asociados</span> fusionamos la tradición del derecho de excelencia con un enfoque moderno y ágil para asegurar el éxito patrimonial y corporativo de nuestros distinguidos clientes.
           </p>
 
-          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2">
+          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2 animate-on-reveal delay-500">
             <button 
               @click="isContactModalOpen = true"
-              class="w-full sm:w-auto text-center bg-[#082a20] hover:bg-[#0c3e30] dark:bg-[#c5a059] dark:hover:bg-[#d6b46c] text-white dark:text-emerald-950 font-bold px-8 py-3.5 rounded-lg text-sm tracking-wider transition-all shadow-xl shadow-emerald-950/10 dark:shadow-amber-500/5 active:scale-98 flex items-center justify-center gap-2"
+              class="w-full sm:w-auto text-center bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-8 py-3.5 rounded-lg text-sm tracking-wider transition-all shadow-xl shadow-emerald-950/10 dark:shadow-amber-500/5 active:scale-98 flex items-center justify-center gap-2"
             >
               <span>Agendar una Consulta</span>
               <ChevronRight class="w-4 h-4" />
             </button>
             <a 
               href="#servicios" 
-              class="w-full sm:w-auto text-center bg-transparent border border-[#082a20]/30 hover:border-[#082a20] dark:border-[#c5a059]/30 dark:hover:border-[#c5a059] text-[#082a20] dark:text-[#c5a059] font-bold px-8 py-3.5 rounded-lg text-sm tracking-wider transition-all flex items-center justify-center"
+              class="w-full sm:w-auto text-center bg-transparent border border-[#c5a059]/30 hover:border-[#c5a059] text-[#c5a059] font-bold px-8 py-3.5 rounded-lg text-sm tracking-wider transition-all flex items-center justify-center"
             >
               Explorar Áreas
             </a>
           </div>
 
           <!-- Quick trust indicators -->
-          <div class="pt-6 grid grid-cols-3 gap-6 border-t border-neutral-300/40 dark:border-neutral-800/50 w-full max-w-lg">
+          <div class="pt-6 grid grid-cols-3 gap-6 border-t border-[#c5a059]/20 w-full max-w-lg animate-on-reveal delay-600">
             <div>
-              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-[#082a20] dark:text-[#c5a059]">25+</p>
-              <p class="text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-semibold">Años de Trayectoria</p>
+              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-amber-200">25+</p>
+              <p class="text-[10px] text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-semibold">Años de Trayectoria</p>
             </div>
             <div>
-              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-[#082a20] dark:text-[#c5a059]">98%</p>
-              <p class="text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-semibold">Casos Exitosos</p>
+              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-amber-200">98%</p>
+              <p class="text-[10px] text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-semibold">Casos Exitosos</p>
             </div>
             <div>
-              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-[#082a20] dark:text-[#c5a059]">500+</p>
-              <p class="text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-semibold">Clientes Activos</p>
+              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-amber-200">500+</p>
+              <p class="text-[10px] text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-semibold">Clientes Activos</p>
             </div>
           </div>
         </div>
 
         <!-- Hero Custom Emblem Graphic (Visual wow) -->
-        <div class="lg:col-span-5 flex justify-center items-center relative">
+        <div class="lg:col-span-5 flex justify-center items-center relative animate-on-reveal delay-300">
           <div class="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-2xl bg-gradient-to-tr from-[#082a20] to-[#041510] dark:from-[#0d3f32] dark:to-[#061e18] p-8 flex flex-col justify-between border-2 border-[#c5a059]/40 shadow-2xl relative overflow-hidden group">
             
             <!-- Graphic background lines -->
@@ -402,11 +443,11 @@ const galleryImages = [
           </div>
           
           <!-- Decorative leaf graphic overlapping -->
-          <div class="absolute -bottom-6 -left-6 bg-[#eae3d5] dark:bg-[#0f2a24] border border-[#c5a059]/30 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
+          <div class="absolute -bottom-6 -left-6 bg-[#051f18] border border-[#c5a059]/30 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
             <span class="text-lg">⭐</span>
             <div class="flex flex-col">
-              <span class="text-[10px] uppercase font-bold text-neutral-500 dark:text-[#c5a059]/70 tracking-widest">Calificación</span>
-              <span class="text-xs font-bold text-neutral-800 dark:text-white">Firma 5 Estrellas</span>
+              <span class="text-[10px] uppercase font-bold text-amber-200/70 tracking-widest">Calificación</span>
+              <span class="text-xs font-bold text-white">Firma 5 Estrellas</span>
             </div>
           </div>
         </div>
@@ -417,11 +458,11 @@ const galleryImages = [
     <section id="servicios" class="py-20 md:py-28 max-w-7xl mx-auto px-4 md:px-8">
       <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Áreas de Práctica Jurídica</span>
-        <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-800 dark:text-white">
+        <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
           Nuestras Especializaciones y Servicios
         </h2>
         <div class="w-16 h-[2px] bg-[#c5a059] mx-auto mt-2"></div>
-        <p class="text-sm md:text-base text-neutral-500 dark:text-neutral-400 font-light">
+        <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-400 font-light">
           Ofrecemos asesoría legal integral con abogados especializados en cada rama del derecho nacional e internacional, brindándote la mayor seguridad jurídica.
         </p>
       </div>
@@ -430,31 +471,31 @@ const galleryImages = [
         <div 
           v-for="service in services" 
           :key="service.title"
-          class="group relative bg-[#f7f5ef]/50 dark:bg-[#071619] p-8 rounded-xl border border-neutral-300/30 dark:border-neutral-800 hover:border-[#c5a059]/50 dark:hover:border-[#c5a059]/50 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
+          class="group relative bg-[#0b3629]/60 dark:bg-[#071619] p-8 rounded-xl border border-[#c5a059]/20 dark:border-neutral-800 hover:border-[#c5a059]/50 dark:hover:border-[#c5a059]/50 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
         >
           <!-- Hover effect back panel -->
           <div class="absolute inset-0 bg-[#082a20]/0 group-hover:bg-[#082a20]/2 dark:group-hover:bg-[#c5a059]/2 transition-colors duration-300"></div>
 
           <div class="space-y-4 z-10">
-            <div class="size-12 rounded-lg bg-[#082a20]/10 dark:bg-[#c5a059]/10 border border-[#082a20]/10 dark:border-[#c5a059]/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
+            <div class="size-12 rounded-lg bg-[#c5a059]/15 dark:bg-[#c5a059]/10 border border-[#c5a059]/20 dark:border-[#c5a059]/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
               {{ service.icon }}
             </div>
             
-            <h3 class="font-['Cinzel',serif] text-lg font-bold text-[#082a20] dark:text-white group-hover:text-[#c5a059] dark:group-hover:text-[#c5a059] transition-colors">
+            <h3 class="font-['Cinzel',serif] text-lg font-bold text-amber-100 dark:text-white group-hover:text-[#c5a059] dark:group-hover:text-[#c5a059] transition-colors">
               {{ service.title }}
             </h3>
             
-            <p class="text-sm text-neutral-500 dark:text-neutral-300 font-light leading-relaxed">
+            <p class="text-sm text-neutral-300 dark:text-neutral-300 font-light leading-relaxed">
               {{ service.description }}
             </p>
           </div>
 
           <!-- Bullet Highlights -->
-          <div class="mt-6 pt-4 border-t border-neutral-300/40 dark:border-neutral-800/80 z-10 flex flex-wrap gap-2">
+          <div class="mt-6 pt-4 border-t border-[#c5a059]/15 dark:border-neutral-800/80 z-10 flex flex-wrap gap-2">
             <span 
               v-for="hi in service.highlights" 
               :key="hi"
-              class="text-[10px] font-semibold bg-[#082a20]/5 dark:bg-neutral-800 px-2 py-0.5 rounded text-[#082a20] dark:text-[#c5a059]"
+              class="text-[10px] font-semibold bg-[#082a20]/40 dark:bg-neutral-800 px-2 py-0.5 rounded text-amber-200/90 dark:text-[#c5a059]"
             >
               {{ hi }}
             </span>
@@ -469,14 +510,14 @@ const galleryImages = [
     </section>
 
     <!-- 5. SECCIÓN ARTÍCULOS, NORMAS Y LEYES (DYNAMIC FILTER SYSTEM) -->
-    <section id="articulos" class="py-20 md:py-28 bg-[#f5f2eb] dark:bg-[#040c0e]/80 border-y border-neutral-300/30 dark:border-neutral-900/50">
+    <section id="articulos" class="py-20 md:py-28 bg-[#051c16] border-y border-[#c5a059]/15">
       <div class="max-w-7xl mx-auto px-4 md:px-8">
         
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
           <div class="space-y-3">
             <span id="normas" class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Artículos, Normas y Leyes</span>
-            <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-800 dark:text-white">
+            <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
               Centro de Análisis Jurídico
             </h2>
             <div class="w-16 h-[2px] bg-[#c5a059]"></div>
@@ -484,25 +525,25 @@ const galleryImages = [
 
           <!-- Live search input -->
           <div class="relative w-full md:w-80">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-200/60" />
             <input 
               v-model="searchKeyword"
               type="text" 
               placeholder="Buscar artículos o leyes..."
-              class="w-full text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg py-2.5 pl-9 pr-4 focus:outline-none focus:border-[#c5a059] transition-all text-neutral-800 dark:text-white"
+              class="w-full text-xs bg-[#0b3629]/50 border border-[#c5a059]/20 rounded-lg py-2.5 pl-9 pr-4 focus:outline-none focus:border-[#c5a059] transition-all text-neutral-100 dark:text-white"
             />
           </div>
         </div>
 
         <!-- Interactive Category Switcher -->
-        <div class="flex flex-wrap gap-2 mb-8 border-b border-neutral-300/40 dark:border-neutral-800/80 pb-4">
+        <div class="flex flex-wrap gap-2 mb-8 border-b border-[#c5a059]/15 pb-4">
           <button 
             @click="selectedCategory = 'todos'"
             :class="[
-              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all',
+              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all border',
               selectedCategory === 'todos' 
-                ? 'bg-[#082a20] text-white dark:bg-[#c5a059] dark:text-[#082a20]' 
-                : 'bg-white/50 hover:bg-white dark:bg-neutral-900/50 dark:hover:bg-neutral-900 border border-neutral-300/30 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300'
+                ? 'bg-[#c5a059] text-[#082a20] border-[#c5a059]' 
+                : 'bg-[#0b3629]/40 hover:bg-[#0b3629]/60 border-[#c5a059]/15 text-amber-200/80'
             ]"
           >
             Ver Todo
@@ -510,10 +551,10 @@ const galleryImages = [
           <button 
             @click="selectedCategory = 'articulos'"
             :class="[
-              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all',
+              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all border',
               selectedCategory === 'articulos' 
-                ? 'bg-[#082a20] text-white dark:bg-[#c5a059] dark:text-[#082a20]' 
-                : 'bg-white/50 hover:bg-white dark:bg-neutral-900/50 dark:hover:bg-neutral-900 border border-neutral-300/30 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300'
+                ? 'bg-[#c5a059] text-[#082a20] border-[#c5a059]' 
+                : 'bg-[#0b3629]/40 hover:bg-[#0b3629]/60 border-[#c5a059]/15 text-amber-200/80'
             ]"
           >
             Artículos Doctrinarios
@@ -521,10 +562,10 @@ const galleryImages = [
           <button 
             @click="selectedCategory = 'normas'"
             :class="[
-              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all',
+              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all border',
               selectedCategory === 'normas' 
-                ? 'bg-[#082a20] text-white dark:bg-[#c5a059] dark:text-[#082a20]' 
-                : 'bg-white/50 hover:bg-white dark:bg-neutral-900/50 dark:hover:bg-neutral-900 border border-neutral-300/30 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300'
+                ? 'bg-[#c5a059] text-[#082a20] border-[#c5a059]' 
+                : 'bg-[#0b3629]/40 hover:bg-[#0b3629]/60 border-[#c5a059]/15 text-amber-200/80'
             ]"
           >
             Leyes & Compendios
@@ -536,29 +577,29 @@ const galleryImages = [
           <div 
             v-for="pub in allPublications" 
             :key="pub.title"
-            class="bg-white dark:bg-neutral-900/50 p-6 md:p-8 rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+            class="bg-[#0b3629]/60 p-6 md:p-8 rounded-xl border border-[#c5a059]/15 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
           >
             <div class="space-y-4">
-              <div class="flex justify-between items-center text-[10px] tracking-wider uppercase font-bold text-neutral-500 dark:text-[#c5a059]">
+              <div class="flex justify-between items-center text-[10px] tracking-wider uppercase font-bold text-amber-200/80">
                 <span>{{ pub.reference || pub.author }}</span>
-                <span class="bg-neutral-200/40 dark:bg-neutral-800 px-2 py-0.5 rounded text-xs lowercase font-normal">{{ pub.readTime }}</span>
+                <span class="bg-[#082a20] text-amber-200 px-2 py-0.5 rounded text-xs lowercase font-normal">{{ pub.readTime }}</span>
               </div>
               
-              <h3 class="font-['Cinzel',serif] text-base md:text-lg font-bold text-neutral-800 dark:text-white leading-tight">
+              <h3 class="font-['Cinzel',serif] text-base md:text-lg font-bold text-neutral-100 dark:text-white leading-tight">
                 {{ pub.title }}
               </h3>
               
-              <p class="text-xs md:text-sm text-neutral-500 dark:text-neutral-300 font-light leading-relaxed">
+              <p class="text-xs md:text-sm text-neutral-300 dark:text-neutral-300 font-light leading-relaxed">
                 {{ pub.excerpt }}
               </p>
             </div>
 
             <!-- Footer Details -->
-            <div class="mt-6 pt-4 border-t border-neutral-200/50 dark:border-neutral-800/50 flex justify-between items-center">
+            <div class="mt-6 pt-4 border-t border-[#c5a059]/15 flex justify-between items-center">
               <span class="text-[10px] text-neutral-400 font-semibold">{{ pub.date }}</span>
               <a 
                 href="#" 
-                class="inline-flex items-center gap-1 text-xs font-bold text-[#082a20] dark:text-[#c5a059] hover:underline"
+                class="inline-flex items-center gap-1 text-xs font-bold text-[#c5a059] hover:underline"
               >
                 <span>Leer completo</span>
                 <ChevronRight class="w-3.5 h-3.5" />
@@ -568,10 +609,10 @@ const galleryImages = [
         </div>
 
         <!-- No Results Fallback -->
-        <div v-else class="text-center py-16 bg-white/40 dark:bg-neutral-900/20 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-800">
+        <div v-else class="text-center py-16 bg-[#0b3629]/30 rounded-xl border border-dashed border-[#c5a059]/20">
           <FileText class="w-12 h-12 text-[#c5a059] mx-auto mb-4 opacity-50" />
-          <h3 class="font-semibold text-lg">No se hallaron resultados</h3>
-          <p class="text-sm text-neutral-500 dark:text-neutral-400">Intenta utilizar otras palabras clave en la barra de búsqueda.</p>
+          <h3 class="font-semibold text-lg text-white">No se hallaron resultados</h3>
+          <p class="text-sm text-neutral-300 dark:text-neutral-400">Intenta utilizar otras palabras clave en la barra de búsqueda.</p>
         </div>
       </div>
     </section>
@@ -580,11 +621,11 @@ const galleryImages = [
     <section id="equipo" class="py-20 md:py-28 max-w-7xl mx-auto px-4 md:px-8">
       <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Nuestro Talento Humano</span>
-        <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-800 dark:text-white">
+        <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
           Socios y Abogados Litigantes
         </h2>
         <div class="w-16 h-[2px] bg-[#c5a059] mx-auto mt-2"></div>
-        <p class="text-sm md:text-base text-neutral-500 dark:text-neutral-400 font-light">
+        <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-400 font-light">
           Un cuerpo legal multidisciplinar y de amplia reputación académica nacional encargado de defender sus derechos corporativos y personales.
         </p>
       </div>
@@ -593,7 +634,7 @@ const galleryImages = [
         <div 
           v-for="partner in partners" 
           :key="partner.name"
-          class="bg-[#f7f5ef]/50 dark:bg-[#071619]/60 rounded-xl border border-neutral-300/30 dark:border-neutral-800/80 p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+          class="bg-[#0b3629]/60 dark:bg-[#071619]/60 rounded-xl border border-[#c5a059]/20 dark:border-neutral-800/80 p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
         >
           <div class="space-y-6">
             <!-- Simulated Professional Portrait / Initials Graphic -->
@@ -608,25 +649,25 @@ const galleryImages = [
             </div>
 
             <div class="space-y-2">
-              <h3 class="font-['Cinzel',serif] text-base md:text-lg font-bold text-neutral-800 dark:text-[#c5a059] group-hover:text-amber-500 transition-colors">
+              <h3 class="font-['Cinzel',serif] text-base md:text-lg font-bold text-neutral-100 dark:text-[#c5a059] group-hover:text-amber-500 transition-colors">
                 {{ partner.name }}
               </h3>
-              <p class="text-xs uppercase tracking-wider font-semibold text-neutral-400 dark:text-neutral-300">
+              <p class="text-xs uppercase tracking-wider font-semibold text-neutral-300 dark:text-neutral-300">
                 {{ partner.role }}
               </p>
               <div class="w-8 h-[2px] bg-[#c5a059]"></div>
             </div>
 
-            <p class="text-xs md:text-sm text-neutral-500 dark:text-neutral-300 font-light leading-relaxed">
+            <p class="text-xs md:text-sm text-neutral-300 dark:text-neutral-300 font-light leading-relaxed">
               {{ partner.credentials }}
             </p>
           </div>
 
-          <div class="mt-6 pt-4 border-t border-neutral-300/40 dark:border-neutral-800/80 flex items-center justify-between">
+          <div class="mt-6 pt-4 border-t border-[#c5a059]/15 dark:border-neutral-800/80 flex items-center justify-between">
             <span class="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">Socio Consultor</span>
             <button 
               @click="isContactModalOpen = true"
-              class="text-xs font-bold text-[#082a20] dark:text-[#c5a059] hover:underline flex items-center gap-1"
+              class="text-xs font-bold text-[#c5a059] hover:underline flex items-center gap-1"
             >
               <span>Agendar cita</span>
               <ChevronRight class="w-3.5 h-3.5" />
@@ -637,15 +678,15 @@ const galleryImages = [
     </section>
 
     <!-- 7. SECCIÓN GALERÍA INSTITUCIONAL (PREMIUM GRID) -->
-    <section id="galeria" class="py-20 md:py-28 bg-[#f5f2eb] dark:bg-[#040c0e]/80 border-y border-neutral-300/30 dark:border-neutral-900/50">
+    <section id="galeria" class="py-20 md:py-28 bg-[#051c16] border-y border-[#c5a059]/15">
       <div class="max-w-7xl mx-auto px-4 md:px-8">
         <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Infraestructura Corporativa</span>
-          <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-800 dark:text-white">
+          <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
             Nuestras Instalaciones en La Paz
           </h2>
           <div class="w-16 h-[2px] bg-[#c5a059] mx-auto mt-2"></div>
-          <p class="text-sm md:text-base text-neutral-500 dark:text-neutral-400 font-light">
+          <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-400 font-light">
             Instalaciones corporativas de primer nivel diseñadas para ofrecerle la mayor privacidad y sofisticación durante sus visitas de negocios.
           </p>
         </div>
@@ -654,21 +695,21 @@ const galleryImages = [
           <div 
             v-for="img in galleryImages" 
             :key="img.title"
-            class="group bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200/50 dark:border-neutral-800/80 p-6 flex flex-col justify-between hover:shadow-lg transition-all duration-300 shadow-sm"
+            class="group bg-[#0b3629]/60 rounded-xl border border-[#c5a059]/15 p-6 flex flex-col justify-between hover:shadow-lg transition-all duration-300 shadow-sm"
           >
             <div class="space-y-4">
               <!-- High-end structural mock representation (WOW aesthetics) -->
-              <div class="w-full aspect-video rounded-lg bg-[#082a20]/5 dark:bg-neutral-800 flex items-center justify-center text-4xl group-hover:scale-[1.03] transition-transform duration-300 border border-neutral-200 dark:border-neutral-800 shadow-inner select-none">
+              <div class="w-full aspect-video rounded-lg bg-[#082a20]/40 flex items-center justify-center text-4xl group-hover:scale-[1.03] transition-transform duration-300 border border-[#c5a059]/15 shadow-inner select-none">
                 {{ img.icon }}
               </div>
-              <h3 class="font-['Cinzel',serif] text-sm font-bold text-[#082a20] dark:text-[#c5a059] leading-tight">
+              <h3 class="font-['Cinzel',serif] text-sm font-bold text-amber-100 dark:text-[#c5a059] leading-tight">
                 {{ img.title }}
               </h3>
-              <p class="text-[11px] text-neutral-500 dark:text-neutral-300 font-light leading-relaxed">
+              <p class="text-[11px] text-neutral-300 dark:text-neutral-300 font-light leading-relaxed">
                 {{ img.desc }}
               </p>
             </div>
-            <div class="mt-4 pt-2 border-t border-neutral-100 dark:border-neutral-800 flex justify-end">
+            <div class="mt-4 pt-2 border-t border-[#c5a059]/15 flex justify-end">
               <span class="text-[9px] uppercase tracking-widest font-semibold text-neutral-400 group-hover:text-[#c5a059] transition-colors">Ver Ampliado</span>
             </div>
           </div>
@@ -684,30 +725,30 @@ const galleryImages = [
         <div class="space-y-6">
           <div class="space-y-3">
             <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Trayectoria y Liderazgo</span>
-            <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-800 dark:text-white">
+            <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
               Sobre Sillerico & Asociados
             </h2>
             <div class="w-16 h-[2px] bg-[#c5a059]"></div>
           </div>
 
-          <p class="text-sm md:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed font-light">
+          <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-300 leading-relaxed font-light">
             Fundada hace más de dos décadas en la ciudad de La Paz, nuestra firma ha sabido consolidarse como un referente de liderazgo e idoneidad jurídica. Ofrecemos a nuestros clientes nacionales y extranjeros un servicio que combina la solidez del derecho clásico con respuestas ágiles a los desafíos de la economía digital y la globalización de negocios.
           </p>
 
-          <p class="text-sm md:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed font-light">
+          <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-300 leading-relaxed font-light">
             Nuestro compromiso es siempre velar por sus intereses patrimoniales mediante soluciones preventivas estratégicas y, de ser necesario, una representación litigante de primer nivel ante todas las instancias judiciales y arbitrales.
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-            <div class="p-5 rounded-lg bg-[#f7f5ef]/50 dark:bg-neutral-900 border border-neutral-300/30 dark:border-neutral-800">
+            <div class="p-5 rounded-lg bg-[#0b3629]/60 border border-[#c5a059]/15">
               <span class="text-lg">🏛️</span>
-              <h3 class="font-['Cinzel',serif] text-sm font-bold text-[#082a20] dark:text-[#c5a059] mt-2 mb-1">Misión</h3>
-              <p class="text-[11px] text-neutral-500 dark:text-neutral-400 font-light">Brindar asesoramiento integral con los más altos estándares éticos, protegiendo los activos patrimoniales y la paz social de nuestros representados.</p>
+              <h3 class="font-['Cinzel',serif] text-sm font-bold text-amber-200 mt-2 mb-1">Misión</h3>
+              <p class="text-[11px] text-neutral-300 font-light">Brindar asesoramiento integral con los más altos estándares éticos, protegiendo los activos patrimoniales y la paz social de nuestros representados.</p>
             </div>
-            <div class="p-5 rounded-lg bg-[#f7f5ef]/50 dark:bg-neutral-900 border border-neutral-300/30 dark:border-neutral-800">
+            <div class="p-5 rounded-lg bg-[#0b3629]/60 border border-[#c5a059]/15">
               <span class="text-lg">🚀</span>
-              <h3 class="font-['Cinzel',serif] text-sm font-bold text-[#082a20] dark:text-[#c5a059] mt-2 mb-1">Visión</h3>
-              <p class="text-[11px] text-neutral-500 dark:text-neutral-400 font-light">Ser reconocidos de forma permanente como la firma de abogados elite referente de Bolivia, líder en resolución de controversias mercantiles complejas.</p>
+              <h3 class="font-['Cinzel',serif] text-sm font-bold text-amber-200 mt-2 mb-1">Visión</h3>
+              <p class="text-[11px] text-neutral-300 font-light">Ser reconocidos de forma permanente como la firma de abogados elite referente de Bolivia, líder en resolución de controversias mercantiles complejas.</p>
             </div>
           </div>
         </div>
@@ -762,10 +803,12 @@ const galleryImages = [
         
         <!-- Corporate Presentation -->
         <div class="md:col-span-4 space-y-4">
-          <div class="flex items-center gap-2">
-            <div class="flex aspect-square size-8 items-center justify-center rounded bg-[#c5a059] text-emerald-950 font-['Cinzel',serif] font-bold text-sm">
-              S&A
-            </div>
+          <div class="flex items-center gap-2.5">
+            <img 
+              src="/images/logo-splash.png" 
+              alt="Sillerico & Asociados" 
+              class="h-8 w-8 object-contain"
+            />
             <span class="font-['Cinzel',serif] text-base font-bold tracking-wider text-[#c5a059]">SILLERICO & ASOCIADOS</span>
           </div>
           
@@ -774,11 +817,17 @@ const galleryImages = [
           </p>
 
           <div class="flex items-center gap-3 pt-2">
-            <a :href="contactLinks.whatsapp" target="_blank" class="size-8 rounded-full bg-emerald-900/40 hover:bg-emerald-900 border border-emerald-500/20 flex items-center justify-center text-white transition-colors">
+            <a :href="contactLinks.whatsapp" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="WhatsApp">
               <MessageSquare class="w-4 h-4 text-emerald-400" />
             </a>
-            <a :href="contactLinks.facebook" target="_blank" class="size-8 rounded-full bg-blue-950/40 hover:bg-blue-900 border border-blue-500/20 flex items-center justify-center text-white transition-colors">
-              <span class="font-bold text-xs">fb</span>
+            <a :href="contactLinks.facebook" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="Facebook">
+              <Facebook class="w-4 h-4 text-[#c5a059]" />
+            </a>
+            <a href="https://youtube.com" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="YouTube">
+              <Youtube class="w-4 h-4 text-[#c5a059]" />
+            </a>
+            <a href="https://x.com" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="X (Twitter)">
+              <Twitter class="w-4 h-4 text-[#c5a059]" />
             </a>
           </div>
         </div>
@@ -935,6 +984,8 @@ const galleryImages = [
       </div>
     </div>
 
+    <SplashScreen :show="showSplash" @reveal="handleSplashReveal" @finish="handleSplashFinish" />
+
   </div>
 </template>
 
@@ -945,5 +996,56 @@ const galleryImages = [
 }
 html {
   scroll-behavior: smooth;
+}
+
+/* Fade in animation (no translate Y transition for perfect logo landing) */
+.animate-fade-in {
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html:not(.splash-pending) .animate-fade-in {
+  opacity: 1;
+}
+
+/* Staggered entrance animations on reveal */
+.animate-on-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When the splash screen is not pending, animate in */
+html:not(.splash-pending) .animate-on-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Delay/Stagger classes */
+.delay-100 {
+  transition-delay: 100ms;
+}
+.delay-200 {
+  transition-delay: 200ms;
+}
+.delay-300 {
+  transition-delay: 300ms;
+}
+.delay-400 {
+  transition-delay: 400ms;
+}
+.delay-500 {
+  transition-delay: 500ms;
+}
+.delay-600 {
+  transition-delay: 600ms;
+}
+
+/* If the user has prefers-reduced-motion, disable the movement but keep the fade */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-reveal {
+    transform: none !important;
+    transition-duration: 0.3s !important;
+    transition-delay: 0s !important;
+  }
 }
 </style>
