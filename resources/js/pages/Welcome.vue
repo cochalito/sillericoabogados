@@ -76,6 +76,62 @@ const submitContactForm = () => {
   }, 2000);
 };
 
+// Reglamento Interno state and structures
+const activeTab = ref('mision'); // 'mision' | 'vision' | 'principios'
+const isReglamentoModalOpen = ref(false);
+
+const reglamentoTabs = {
+  mision: {
+    title: 'Misión Institucional',
+    content: 'Brindar servicios jurídicos integrales, estratégicos y especializados con excelencia profesional, ética, liderazgo jurídico y compromiso institucional, orientados a la defensa efectiva de los intereses de nuestros clientes, la solución eficiente de conflictos y la consolidación de una firma de abogados moderna, confiable y reconocida por su calidad humana, técnica y académica, promoviendo el trabajo colaborativo.'
+  },
+  vision: {
+    title: 'Visión de Excelencia',
+    content: 'Consolidarse como una firma de abogados líder, moderna y prestigiosa a nivel nacional e internacional, reconocida por su excelencia jurídica, liderazgo institucional, ética profesional y capacidad estratégica, integrando un equipo multidisciplinario de abogados altamente especializados comprometidos con la defensa efectiva de los derechos.'
+  },
+  principios: [
+    { title: 'Ética Profesional', desc: 'Actuar bajo estrictos principios morales y rectitud jurídica.' },
+    { title: 'Confidencialidad', desc: 'Reserva absoluta sobre clientes, procesos y estrategias.' },
+    { title: 'Lealtad', desc: 'Fidelidad inquebrantable a las normas y a nuestros patrocinados.' },
+    { title: 'Excelencia', desc: 'Alta calidad técnica, académica y humana en cada caso.' },
+    { title: 'Transparencia', desc: 'Claridad en honorarios, procesos e información institucional.' },
+    { title: 'Disciplina', desc: 'Rigurosidad, orden y compromiso constante con el derecho.' }
+  ]
+};
+
+const reglamentoChapters = [
+  {
+    title: 'Capítulo I: Disposiciones Generales',
+    articles: [
+      { num: 'Art. 1', title: 'Naturaleza', desc: 'Sillerico & Asociados es una firma jurídica privada dedicada al ejercicio profesional del derecho, asesoría integral y patrocinio legal.' },
+      { num: 'Art. 2', title: 'Denominación', desc: 'Uso obligatorio del nombre, logotipo e imagen corporativa para todos los integrantes.' },
+      { num: 'Art. 3', title: 'Domicilio y Organización', desc: 'Oficinas centrales en Edif. Park Inn, Piso 6 Of. 66, Calle Federico Suazo y Bueno No. 1598, La Paz.' }
+    ]
+  },
+  {
+    title: 'Capítulo II: Estructura Organizacional',
+    articles: [
+      { num: 'Art. 4', title: 'Dirección General', desc: 'Administración y representación general a cargo del Socio Fundador.' },
+      { num: 'Art. 5', title: 'Subdirección', desc: 'Coordinación jurídica y supervisión operativa de la firma.' },
+      { num: 'Art. 6', title: 'Abogados Asociados', desc: 'Llevar procesos propios e institucionales utilizando los recursos comunes.' }
+    ]
+  },
+  {
+    title: 'Capítulo III: Áreas Comunes y Normas',
+    articles: [
+      { num: 'Art. 8-10', title: 'Uso de Infraestructura', desc: 'Regulación de la sala de reuniones, recepción y kitchenette. Se prohíbe el consumo de bebidas alcohólicas.' },
+      { num: 'Art. 11', title: 'Secretaría y Recepción', desc: 'Preservar absoluta confidencialidad y coordinar agendas de forma profesional.' }
+    ]
+  },
+  {
+    title: 'Capítulo VI: Ética y Confidencialidad',
+    articles: [
+      { num: 'Art. 20', title: 'Confidencialidad Absoluta', desc: 'Toda información de clientes, procesos y estrategias es estrictamente confidencial, incluso tras retirarse de la firma.' },
+      { num: 'Art. 21', title: 'Conducta Profesional', desc: 'Respeto mutuo, puntualidad, honestidad y prohibición de dañar la imagen institucional.' }
+    ]
+  }
+];
+
 // Data structures matching user requests
 const menuItems = [
   { label: 'Servicios', href: '#servicios', icon: Scale },
@@ -93,6 +149,13 @@ const contactLinks = {
   emails: ['contacto@sillericoasociados.com', 'info@sillericoasociados.com'],
   address: 'Av. Mariscal Santa Cruz, Edificio Hansa, Piso 12, La Paz, Bolivia',
   locationUrl: 'https://maps.google.com/?q=Edificio+Hansa+La+Paz'
+};
+
+const featuredService = {
+  title: 'Derecho Penal y Defensa Litigante',
+  description: 'Defensa penal corporativa y personal rigurosa ante tribunales nacionales, con especialización en delitos financieros, patrimoniales y procesal penal de alta complejidad. Ofrecemos representación legal estratégica en todas las etapas del proceso de litigio penal.',
+  icon: '⚜️',
+  highlights: ['Litigios penales', 'Delitos corporativos', 'Apelaciones y recursos', 'Derecho procesal penal', 'Criminal compliance']
 };
 
 const services = [
@@ -115,12 +178,6 @@ const services = [
     highlights: ['Registro de marcas', 'Derechos de autor', 'Secretos comerciales']
   },
   {
-    title: 'Derecho Penal y Defensa Litigante',
-    description: 'Defensa penal corporativa y personal rigurosa ante tribunales nacionales, con especialización en delitos financieros, patrimoniales y procesal penal.',
-    icon: '⚜️',
-    highlights: ['Litigios penales', 'Delitos corporativos', 'Apelaciones y recursos']
-  },
-  {
     title: 'Derecho Laboral y Social',
     description: 'Asesoría en contratos de trabajo, reestructuraciones salariales, representación ante ministerios del ramo, y prevención de contingencias laborales patronales.',
     icon: '👔',
@@ -131,6 +188,24 @@ const services = [
     description: 'Mediación experta y arbitraje en controversias comerciales nacionales e internacionales como una alternativa ágil y altamente confidencial al litigio tradicional.',
     icon: '🤝',
     highlights: ['Mediación comercial', 'Arbitraje de inversiones', 'Estrategias preventivas']
+  },
+  {
+    title: 'Derecho Constitucional y Derechos Humanos',
+    description: 'Asesoramiento y representación legal en la interposición de recursos constitucionales, acciones de amparo, acciones de libertad y la defensa ante organismos internacionales.',
+    icon: '🏛️',
+    highlights: ['Amparo constitucional', 'Acciones de libertad', 'Corte Interamericana']
+  },
+  {
+    title: 'Derecho Civil y Constitucional',
+    description: 'Defensa estratégica en contratos, propiedad, obligaciones, responsabilidad civil y litigios civiles de alta complejidad fundamentados en las garantías constitucionales.',
+    icon: '📜',
+    highlights: ['Contratos y obligaciones', 'Derechos reales', 'Responsabilidad civil']
+  },
+  {
+    title: 'Derecho Tributario y Aduanero',
+    description: 'Patrocinio en procesos de fiscalización tributaria, impugnación de resoluciones administrativas ante la AIT y planificación fiscal preventiva para empresas.',
+    icon: '📊',
+    highlights: ['Impugnación tributaria', 'Planificación fiscal', 'Procesos aduaneros']
   }
 ];
 
@@ -271,34 +346,34 @@ const galleryImages = [
             <!-- Iconos de Contacto y Redes Sociales (Estilo Linktree burbujas con escala en hover) -->
             <div class="flex items-center gap-2">
               <!-- Teléfono con icono clicable para llamadas (Burbuja Gold estilo Linktree) -->
-              <a :href="'tel:' + contactLinks.phones[0].replace(/\s+/g, '')" class="w-8 h-8 rounded-full bg-[#c5a059] flex items-center justify-center text-[#082a20] transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="Llamar">
-                <Phone class="w-4 h-4" />
+              <a :href="'tel:' + contactLinks.phones[0].replace(/\s+/g, '')" class="w-7 h-7 rounded-full bg-[#c5a059] flex items-center justify-center text-[#082a20] transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="Llamar">
+                <Phone class="w-3.5 h-3.5" />
               </a>
 
               <!-- WhatsApp (Burbuja Verde) -->
-              <a :href="contactLinks.whatsapp" target="_blank" class="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="WhatsApp">
-                <svg class="w-4 h-4 fill-white" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+              <a :href="contactLinks.whatsapp" target="_blank" class="w-7 h-7 rounded-full bg-[#25D366] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="WhatsApp">
+                <svg class="w-3.5 h-3.5 fill-white" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                   <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
                 </svg>
               </a>
 
               <!-- Facebook -->
-              <a :href="contactLinks.facebook" target="_blank" class="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="Facebook">
-                <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <a :href="contactLinks.facebook" target="_blank" class="w-7 h-7 rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="Facebook">
+                <svg class="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
               </a>
 
               <!-- YouTube -->
-              <a href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-full bg-[#FF0000] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="YouTube">
-                <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <a href="https://youtube.com" target="_blank" class="w-7 h-7 rounded-full bg-[#FF0000] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="YouTube">
+                <svg class="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.507 9.386.507 9.386.507s7.516 0 9.387-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </a>
 
               <!-- X (Twitter) -->
-              <a href="https://x.com" target="_blank" class="w-8 h-8 rounded-full bg-[#14171A] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="X (Twitter)">
-                <svg class="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <a href="https://x.com" target="_blank" class="w-7 h-7 rounded-full bg-[#14171A] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:brightness-110 shadow-md" title="X (Twitter)">
+                <svg class="w-3 h-3 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
               </a>
@@ -313,7 +388,7 @@ const galleryImages = [
                 v-for="item in menuItems" 
                 :key="item.label" 
                 :href="item.href"
-                class="text-xs md:text-sm font-['Cinzel',serif] font-bold tracking-wider text-amber-100/90 hover:text-[#c5a059] transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#c5a059] hover:after:w-full after:transition-all"
+                class="text-sm lg:text-base font-['Cinzel',serif] font-bold tracking-wider text-amber-100/90 hover:text-[#c5a059] transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#c5a059] hover:after:w-full after:transition-all"
               >
                 {{ item.label }}
               </a>
@@ -339,115 +414,138 @@ const galleryImages = [
       </div>
     </header>
 
-    <!-- 3. SECCIÓN HERO PRINCIPAL (PREMIUM PRESENTATION) -->
-    <section class="relative w-full overflow-hidden py-20 lg:py-32 flex items-center justify-center bg-gradient-to-br from-[#082a20] via-[#051f18] to-[#041510] border-b border-[#c5a059]/10">
+    <!-- 3. SECCIÓN HERO PRINCIPAL (PREMIUM PRESENTATION WITH LOGO BACKGROUND) -->
+    <section class="relative w-full overflow-x-hidden py-14 lg:py-20 flex items-center justify-center bg-[#082a20] border-b border-[#c5a059]/10">
       
-      <!-- Subtle Decorative Background Circles -->
-      <div class="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none"></div>
-      <div class="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl pointer-events-none"></div>
-      
-      <div class="max-w-7xl mx-auto px-4 md:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Hero Text -->
-        <div class="lg:col-span-7 flex flex-col items-start text-left space-y-6">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-[#c5a059]/20 text-xs font-semibold text-amber-200/90 animate-on-reveal delay-200">
-            <Scale class="w-3.5 h-3.5" />
-            <span>Firma de Abogados Elite - La Paz, Bolivia</span>
+      <!-- Logo Background Wrapper -->
+      <div class="absolute inset-y-0 right-0 w-full lg:w-[48%] z-0 pointer-events-none overflow-hidden">
+        <!-- Logo Image: cover background spanning full right side, borderless and bright colors -->
+        <div class="absolute inset-0 bg-[url('/images/logo-main.jpg')] bg-no-repeat bg-right bg-cover opacity-100 filter brightness-105 contrast-100"></div>
+        
+        <!-- Gradient overlay that ONLY fades the left edge of the image to blend it with the left column -->
+        <div class="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-[#082a20] to-transparent"></div>
+        <!-- Soft top/bottom edge blending -->
+        <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#082a20] to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#082a20] to-transparent"></div>
+        
+        <!-- Subtle Decorative Background Circles -->
+        <div class="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl"></div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 md:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+        <!-- Hero Text content, taking more width (8 columns) and positioned on the left/center -->
+        <div class="lg:col-span-8 xl:col-span-7 flex flex-col items-start text-left space-y-8">
+          
+          <!-- Motto (Mobile only) -->
+          <div class="lg:hidden inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/50 border border-[#c5a059]/30 text-xs font-semibold text-amber-200/90 shadow-md">
+            <Scale class="w-3.5 h-3.5 text-[#c5a059]" />
+            <span class="font-['Cinzel',serif] italic tracking-wider">“Liderazgo jurídico y compromiso institucional”</span>
           </div>
 
-          <h1 class="font-['Cinzel',serif] text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#c5a059] leading-[1.1] md:leading-[1.05] animate-on-reveal delay-300">
-            Compromiso Inquebrantable, <br class="hidden sm:inline" />
-            <span class="text-neutral-100 dark:text-white">Excelencia Legal.</span>
+          <!-- Title (Slightly Smaller Font Size) -->
+          <h1 class="font-['Cinzel',serif] text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#c5a059] leading-[1.15] animate-on-reveal delay-300 drop-shadow-md">
+            Sillerico & Asociados <br />
+            <span class="text-neutral-100 dark:text-white text-2xl sm:text-3xl md:text-4xl font-light font-['Playfair_Display',serif]">Firma de Abogados Elite</span>
           </h1>
 
-          <p class="text-base md:text-lg text-neutral-300 dark:text-neutral-300 max-w-xl leading-relaxed font-light animate-on-reveal delay-400">
-            En <span class="font-semibold text-white dark:text-white">Sillerico & Abogados</span> fusionamos la tradición del derecho de excelencia con un enfoque moderno y ágil para asegurar el éxito patrimonial y corporativo de nuestros distinguidos clientes.
-          </p>
+          <!-- Pestañas Interactivas del Reglamento (Larger Text, Padding and Fixed Heights to prevent shifting) -->
+          <div class="w-full bg-[#051f18]/45 border border-[#c5a059]/25 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl backdrop-blur-md animate-on-reveal delay-400 h-[510px] sm:h-[340px] lg:h-[310px] flex flex-col justify-between">
+            <!-- Botones de Pestañas -->
+            <div class="flex border-b border-[#c5a059]/20 pb-2 gap-4 shrink-0">
+              <button 
+                @click="activeTab = 'mision'"
+                :class="[
+                  'px-5 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
+                  activeTab === 'mision' 
+                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/5' 
+                    : 'text-neutral-400 border-transparent hover:text-amber-100'
+                ]"
+              >
+                Misión
+              </button>
+              <button 
+                @click="activeTab = 'vision'"
+                :class="[
+                  'px-5 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
+                  activeTab === 'vision' 
+                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/5' 
+                    : 'text-neutral-400 border-transparent hover:text-amber-100'
+                ]"
+              >
+                Visión
+              </button>
+              <button 
+                @click="activeTab = 'principios'"
+                :class="[
+                  'px-5 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
+                  activeTab === 'principios' 
+                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/5' 
+                    : 'text-neutral-400 border-transparent hover:text-amber-100'
+                ]"
+              >
+                Principios
+              </button>
+            </div>
 
-          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2 animate-on-reveal delay-500">
-            <button 
-              @click="isContactModalOpen = true"
-              class="w-full sm:w-auto text-center bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-8 py-3.5 rounded-lg text-sm tracking-wider transition-all shadow-xl shadow-emerald-950/10 dark:shadow-amber-500/5 active:scale-98 flex items-center justify-center gap-2"
-            >
-              <span>Agendar una Consulta</span>
-              <ChevronRight class="w-4 h-4" />
-            </button>
-            <a 
-              href="#servicios" 
-              class="w-full sm:w-auto text-center bg-transparent border border-[#c5a059]/30 hover:border-[#c5a059] text-[#c5a059] font-bold px-8 py-3.5 rounded-lg text-sm tracking-wider transition-all flex items-center justify-center"
-            >
-              Explorar Áreas
-            </a>
+            <!-- Contenido de Misión/Visión (Fixed Height) -->
+            <div v-if="activeTab === 'mision' || activeTab === 'vision'" class="space-y-3 h-[320px] sm:h-[180px] lg:h-[160px] flex flex-col justify-center transition-all duration-300 flex-1">
+              <h3 class="font-['Cinzel',serif] text-sm md:text-base font-bold text-[#c5a059] tracking-widest uppercase">
+                {{ reglamentoTabs[activeTab].title }}
+              </h3>
+              <p class="text-sm md:text-base text-neutral-200 font-light leading-relaxed">
+                {{ reglamentoTabs[activeTab].content }}
+              </p>
+            </div>
+
+            <!-- Contenido de Principios (Fixed Height with scrollable grid for absolute safety) -->
+            <div v-else-if="activeTab === 'principios'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-[320px] sm:h-[180px] lg:h-[160px] overflow-y-auto transition-all duration-300 flex-1 custom-scrollbar">
+              <div 
+                v-for="p in reglamentoTabs.principios" 
+                :key="p.title"
+                class="flex flex-col p-3.5 bg-[#082a20]/60 rounded-xl border border-[#c5a059]/15 shadow-sm"
+              >
+                <span class="text-sm font-bold text-[#c5a059] font-['Cinzel',serif]">{{ p.title }}</span>
+                <span class="text-xs text-neutral-300 font-light mt-1 leading-normal">{{ p.desc }}</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Quick trust indicators -->
-          <div class="pt-6 grid grid-cols-3 gap-6 border-t border-[#c5a059]/20 w-full max-w-lg animate-on-reveal delay-600">
-            <div>
-              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-amber-200">25+</p>
-              <p class="text-[10px] text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-semibold">Años de Trayectoria</p>
-            </div>
-            <div>
-              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-amber-200">98%</p>
-              <p class="text-[10px] text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-semibold">Casos Exitosos</p>
-            </div>
-            <div>
-              <p class="font-['Cinzel',serif] text-2xl md:text-3xl font-bold text-amber-200">500+</p>
-              <p class="text-[10px] text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-semibold">Clientes Activos</p>
-            </div>
+          <!-- Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2 animate-on-reveal delay-500">
+            <button 
+              @click="isReglamentoModalOpen = true"
+              class="w-full sm:w-auto text-center bg-transparent border border-[#c5a059] hover:bg-[#c5a059]/10 text-[#c5a059] font-bold px-10 py-4 rounded-lg text-sm md:text-base tracking-wider transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-lg"
+            >
+              <FileText class="w-5 h-5" />
+              <span>Reglamento Interno</span>
+            </button>
+            <button 
+              @click="isContactModalOpen = true"
+              class="w-full sm:w-auto text-center bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-10 py-4 rounded-lg text-sm md:text-base tracking-wider transition-all shadow-xl shadow-emerald-950/20 active:scale-98 flex items-center justify-center gap-2.5 cursor-pointer"
+            >
+              <span>Agendar una Consulta</span>
+              <ChevronRight class="w-5 h-5" />
+            </button>
           </div>
         </div>
 
-        <!-- Hero Custom Emblem Graphic (Visual wow) -->
-        <div class="lg:col-span-5 flex justify-center items-center relative animate-on-reveal delay-300">
-          <div class="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-2xl bg-gradient-to-tr from-[#082a20] to-[#041510] dark:from-[#0d3f32] dark:to-[#061e18] p-8 flex flex-col justify-between border-2 border-[#c5a059]/40 shadow-2xl relative overflow-hidden group">
-            
-            <!-- Graphic background lines -->
-            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-            
-            <div class="flex justify-between items-start z-10">
-              <span class="font-['Cinzel',serif] text-amber-200/40 text-lg">S&A</span>
-              <span class="text-amber-200/40 text-xs">BOLIVIA</span>
-            </div>
-
-            <!-- Majestic Scale Icon -->
-            <div class="flex justify-center items-center z-10 py-4">
-              <svg class="w-32 h-32 md:w-40 md:h-40 text-[#c5a059] fill-[#c5a059]/10 group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Scale Base & Pillars -->
-                <path d="M48 20h4v60h-4z" />
-                <path d="M30 80h40v4H30z" />
-                <path d="M40 84h20v2H40z" />
-                <!-- Beam -->
-                <path d="M15 28h70v3H15z" />
-                <circle cx="50" cy="23" r="4" />
-                <!-- Left Scale Cup -->
-                <path d="M15 29.5l10 25h-20z" />
-                <path d="M25 54.5v2H5v-2z" />
-                <path d="M15 56.5a10 10 0 0 1-10-10h20a10 10 0 0 1-10 10z" />
-                <!-- Right Scale Cup -->
-                <path d="M85 29.5l10 25h-20z" />
-                <path d="M95 54.5v2H75v-2z" />
-                <path d="M85 56.5a10 10 0 0 1-10-10h20a10 10 0 0 1-10 10z" />
-              </svg>
-            </div>
-
-            <div class="flex flex-col justify-end items-center text-center z-10 space-y-1">
-              <span class="font-['Cinzel',serif] text-base font-bold text-amber-200 uppercase tracking-widest leading-none">
-                LIDERAZGO JURÍDICO
-              </span>
-              <span class="text-[9px] text-[#c5a059] uppercase tracking-widest">
-                Sillerico & Abogados
-              </span>
-            </div>
-            
-            <!-- Metallic edge highlights -->
-            <div class="absolute inset-0 rounded-2xl border border-white/5 pointer-events-none"></div>
+        <!-- Right Column containing Motto and Acreditación, centered horizontally relative to the logo -->
+        <div class="lg:col-span-4 xl:col-span-5 hidden lg:flex flex-col justify-end relative animate-on-reveal delay-500 min-h-[300px] z-10">
+          <!-- Motto aligned to the top-center, positioned higher to clear the logo -->
+          <div class="absolute -top-32 left-1/2 -translate-x-1/2 bg-[#051f18]/95 border border-[#c5a059]/30 px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 backdrop-blur-md z-30 whitespace-nowrap">
+            <Scale class="w-4 h-4 text-[#c5a059]" />
+            <span class="font-['Cinzel',serif] text-xs font-semibold text-amber-200/90 italic tracking-wider">
+              “Liderazgo jurídico y compromiso institucional”
+            </span>
           </div>
-          
-          <!-- Decorative leaf graphic overlapping -->
-          <div class="absolute -bottom-6 -left-6 bg-[#051f18] border border-[#c5a059]/30 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
-            <span class="text-lg">⭐</span>
-            <div class="flex flex-col">
-              <span class="text-[10px] uppercase font-bold text-amber-200/70 tracking-widest">Calificación</span>
-              <span class="text-xs font-bold text-white">Firma 5 Estrellas</span>
+
+          <!-- Bottom-center Badge: Acreditación, positioned lower to clear the logo -->
+          <div class="absolute -bottom-24 left-1/2 -translate-x-1/2 bg-[#051f18]/95 border border-[#c5a059]/30 px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 backdrop-blur-md z-30 whitespace-nowrap">
+            <span class="text-2xl">⭐</span>
+            <div class="flex flex-col text-left">
+              <span class="text-[10px] uppercase font-bold text-amber-200/70 tracking-widest leading-none">Acreditación Oficial</span>
+              <span class="text-sm font-bold text-white mt-1">Firma Jurídica de Referencia</span>
             </div>
           </div>
         </div>
@@ -467,6 +565,61 @@ const galleryImages = [
         </p>
       </div>
 
+      <!-- Tarjeta de Especialidad Destacada (Derecho Penal y Defensa Litigante) -->
+      <div class="mb-12 relative group bg-gradient-to-br from-[#0b3c2e] to-[#051c15] p-8 md:p-10 rounded-2xl border border-[#c5a059] shadow-[0_0_20px_rgba(197,160,89,0.15)] hover:shadow-[0_0_30px_rgba(197,160,89,0.25)] hover:border-[#d6b46c] transition-all duration-500 overflow-hidden">
+        <!-- Shine Overlay Effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#c5a059]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          <!-- Columna Izquierda (Info y Descripción) -->
+          <div class="lg:col-span-8 space-y-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a059]/10 border border-[#c5a059]/30 text-xs font-bold uppercase tracking-widest text-[#c5a059]">
+              <span>⭐ Especialización Principal</span>
+            </div>
+            
+            <div class="flex items-start gap-4">
+              <div class="size-14 rounded-xl bg-[#c5a059]/20 border border-[#c5a059]/40 flex items-center justify-center text-3xl shrink-0 shadow-lg">
+                {{ featuredService.icon }}
+              </div>
+              <div class="space-y-2">
+                <h3 class="font-['Cinzel',serif] text-2xl md:text-3xl font-extrabold text-amber-100 group-hover:text-[#c5a059] transition-colors leading-tight">
+                  {{ featuredService.title }}
+                </h3>
+                <p class="text-sm md:text-base text-neutral-200 font-light leading-relaxed">
+                  {{ featuredService.description }}
+                </p>
+              </div>
+            </div>
+            
+            <div class="pt-4 flex flex-wrap gap-4 items-center">
+              <button 
+                @click="isContactModalOpen = true"
+                class="bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-6 py-3 rounded-lg text-xs md:text-sm tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
+              >
+                <span>Solicitar Defensa Penal</span>
+                <ChevronRight class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          
+          <!-- Columna Derecha (Highlights Destacados) -->
+          <div class="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-[#c5a059]/20 pt-6 lg:pt-0 lg:pl-8 space-y-4">
+            <h4 class="font-['Cinzel',serif] text-xs font-bold text-amber-200/70 tracking-widest uppercase">Áreas de Enfoque</h4>
+            <ul class="space-y-3">
+              <li 
+                v-for="hi in featuredService.highlights" 
+                :key="hi"
+                class="flex items-center gap-3 text-sm text-neutral-200 font-light"
+              >
+                <span class="size-2 rounded-full bg-[#c5a059] shrink-0"></span>
+                <span>{{ hi }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid para las otras 8 especialidades -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div 
           v-for="service in services" 
@@ -817,17 +970,17 @@ const galleryImages = [
           </p>
 
           <div class="flex items-center gap-3 pt-2">
-            <a :href="contactLinks.whatsapp" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="WhatsApp">
-              <MessageSquare class="w-4 h-4 text-emerald-400" />
+            <a :href="contactLinks.whatsapp" target="_blank" class="size-7 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="WhatsApp">
+              <MessageSquare class="w-3.5 h-3.5 text-emerald-400" />
             </a>
-            <a :href="contactLinks.facebook" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="Facebook">
-              <Facebook class="w-4 h-4 text-[#c5a059]" />
+            <a :href="contactLinks.facebook" target="_blank" class="size-7 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="Facebook">
+              <Facebook class="w-3.5 h-3.5 text-[#c5a059]" />
             </a>
-            <a href="https://youtube.com" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="YouTube">
-              <Youtube class="w-4 h-4 text-[#c5a059]" />
+            <a href="https://youtube.com" target="_blank" class="size-7 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="YouTube">
+              <Youtube class="w-3.5 h-3.5 text-[#c5a059]" />
             </a>
-            <a href="https://x.com" target="_blank" class="size-8 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="X (Twitter)">
-              <Twitter class="w-4 h-4 text-[#c5a059]" />
+            <a href="https://x.com" target="_blank" class="size-7 rounded-full bg-[#051f18] hover:bg-[#082a20] border border-[#c5a059]/20 flex items-center justify-center text-white transition-colors" title="X (Twitter)">
+              <Twitter class="w-3.5 h-3.5 text-[#c5a059]" />
             </a>
           </div>
         </div>
@@ -980,6 +1133,57 @@ const galleryImages = [
           </div>
           <h4 class="font-['Cinzel',serif] text-base font-bold text-neutral-800 dark:text-[#c5a059]">¡Solicitud Recibida!</h4>
           <p class="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto font-light">Un asesor legal de Sillerico & Abogados se contactará contigo por teléfono o WhatsApp de forma inmediata.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. DIALOG MODAL FOR REGLAMENTO INTERNO -->
+    <div v-if="isReglamentoModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/80 backdrop-blur-sm">
+      <div 
+        class="bg-[#051f18] text-[#eae5da] rounded-xl border border-[#c5a059]/30 max-w-2xl w-full p-6 relative shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]"
+        @click.stop
+      >
+        <button 
+          @click="isReglamentoModalOpen = false" 
+          class="absolute top-4 right-4 text-amber-100/60 hover:text-white text-lg font-bold cursor-pointer"
+        >
+          ✕
+        </button>
+
+        <div class="text-center mb-4 space-y-2 shrink-0">
+          <div class="size-10 rounded-full bg-[#c5a059]/10 border border-[#c5a059]/30 flex items-center justify-center mx-auto text-xl text-[#c5a059]">
+            📜
+          </div>
+          <h3 class="font-['Cinzel',serif] text-base md:text-lg font-bold text-[#c5a059]">Reglamento Interno de Trabajo</h3>
+          <p class="text-xs text-neutral-400 font-light">Sillerico & Asociados – Consorcio Jurídico</p>
+        </div>
+
+        <div class="overflow-y-auto pr-2 space-y-6 flex-1 custom-scrollbar">
+          <div v-for="ch in reglamentoChapters" :key="ch.title" class="space-y-3">
+            <h4 class="font-['Cinzel',serif] text-xs md:text-sm font-bold text-[#c5a059] border-b border-[#c5a059]/20 pb-1 uppercase tracking-wider">
+              {{ ch.title }}
+            </h4>
+            <div class="space-y-3 pl-2">
+              <div v-for="art in ch.articles" :key="art.num" class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold text-[#c5a059] bg-[#c5a059]/15 px-1.5 py-0.5 rounded uppercase tracking-widest">{{ art.num }}</span>
+                  <span class="text-xs font-semibold text-white font-['Cinzel',serif]">{{ art.title }}</span>
+                </div>
+                <p class="text-xs text-neutral-300 font-light leading-relaxed pl-1">
+                  {{ art.desc }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-[#c5a059]/20 flex justify-end shrink-0">
+          <button 
+            @click="isReglamentoModalOpen = false"
+            class="bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-6 py-2 rounded text-xs tracking-wider transition-all cursor-pointer"
+          >
+            Cerrar
+          </button>
         </div>
       </div>
     </div>
