@@ -4,7 +4,7 @@ import {
   Sun, Moon, Monitor, Phone, MessageSquare, MapPin, 
   ChevronRight, Search, FileText, Scale, Users, Image as ImageIcon, 
   Info, ExternalLink, Mail, Check, Star, ArrowUpRight,
-  Facebook, Youtube, Twitter
+  Facebook, Youtube, Twitter, Menu, X
 } from 'lucide-vue-next';
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import SplashScreen from '@/components/SplashScreen.vue';
@@ -122,13 +122,72 @@ const submitContactForm = () => {
   }, 3500);
 };
 
-const scrollToContact = () => {
-  if (typeof window !== 'undefined') {
-    const el = document.getElementById('contacto');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+// State and logic for Curtain Navigation Transition (Transición de Cortina entre Menús)
+const isCurtainActive = ref(false);
+const curtainDirection = ref<'l2r' | 'r2l'>('l2r');
+const curtainPhase = ref<'idle' | 'covering' | 'covered' | 'uncovering'>('idle');
+const targetMenuLabel = ref('');
+const currentSectionHref = ref('#servicios');
+const isMobileMenuOpen = ref(false);
+
+const navigateToSection = (targetHref: string, label?: string, forceDirection?: 'l2r' | 'r2l') => {
+  if (typeof window === 'undefined') return;
+
+  const targetId = targetHref.replace('#', '');
+  const targetEl = document.getElementById(targetId);
+  if (!targetEl) return;
+
+  isMobileMenuOpen.value = false;
+
+  const foundItem = menuItems.find(item => item.href === targetHref);
+  const title = label || foundItem?.label || 'Sección';
+
+  if (forceDirection) {
+    curtainDirection.value = forceDirection;
+  } else {
+    const currentIndex = menuItems.findIndex(item => item.href === currentSectionHref.value);
+    const targetIndex = menuItems.findIndex(item => item.href === targetHref);
+
+    if (targetIndex >= 0 && currentIndex >= 0) {
+      curtainDirection.value = targetIndex >= currentIndex ? 'l2r' : 'r2l';
+    } else {
+      curtainDirection.value = 'l2r';
     }
   }
+
+  targetMenuLabel.value = title;
+  curtainPhase.value = 'idle';
+  isCurtainActive.value = true;
+
+  // Trigger smooth GPU sliding transition sequence (Ampliada a ~1.65s para apreciar logo-main.jpg)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      curtainPhase.value = 'covering';
+
+      // Stage 1: Curtain covers the screen (650ms)
+      setTimeout(() => {
+        curtainPhase.value = 'covered';
+        
+        // Instant scroll behind the curtain
+        targetEl.scrollIntoView({ behavior: 'instant' as ScrollBehavior });
+        currentSectionHref.value = targetHref;
+
+        // Stage 2: Hold for 350ms to present logo-main.jpg, then slide off screen (650ms)
+        setTimeout(() => {
+          curtainPhase.value = 'uncovering';
+
+          setTimeout(() => {
+            curtainPhase.value = 'idle';
+            isCurtainActive.value = false;
+          }, 650);
+        }, 350);
+      }, 650);
+    });
+  });
+};
+
+const scrollToContact = () => {
+  navigateToSection('#contacto', 'Contactos');
 };
 
 // Reglamento Interno state and structures
@@ -507,24 +566,58 @@ const galleryImages = [
           </div>
 
           <!-- Nivel 2: Menús del Sistema y Botones de Acción -->
-          <div class="flex items-center justify-between">
-            <!-- Navigation Links -->
-            <nav class="hidden lg:flex items-center gap-6">
+          <div class="flex flex-col justify-center">
+            <div class="flex items-center justify-between">
+              <!-- Navigation Links (Desktop) -->
+              <nav class="hidden lg:flex items-center gap-6">
+                <a 
+                  v-for="item in menuItems" 
+                  :key="item.label" 
+                  :href="item.href"
+                  @click.prevent="navigateToSection(item.href, item.label)"
+                  :class="[
+                    'text-sm lg:text-base font-[\'Cinzel\',serif] font-bold tracking-wider transition-colors relative cursor-pointer',
+                    currentSectionHref === item.href ? 'text-[#c5a059] after:w-full' : 'text-amber-100/90 hover:text-[#c5a059]',
+                    'after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:bg-[#c5a059] hover:after:w-full after:transition-all'
+                  ]"
+                >
+                  {{ item.label }}
+                </a>
+              </nav>
+
+              <!-- Navigation Bar (Mobile Header) -->
+              <div class="lg:hidden flex items-center justify-between w-full">
+                <span class="text-amber-100/90 font-['Cinzel',serif] text-sm font-bold tracking-wider">
+                  SILLERICO & ABOGADOS
+                </span>
+                <button 
+                  @click="isMobileMenuOpen = !isMobileMenuOpen" 
+                  class="p-1.5 rounded-lg border border-[#c5a059]/30 bg-[#051f18] text-[#c5a059] hover:bg-[#082a20] transition-colors cursor-pointer"
+                  aria-label="Abrir menú"
+                >
+                  <Menu v-if="!isMobileMenuOpen" class="w-5 h-5" />
+                  <X v-else class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Mobile Navigation Drawer -->
+            <div v-if="isMobileMenuOpen" class="lg:hidden mt-3 pt-3 border-t border-[#c5a059]/20 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
               <a 
                 v-for="item in menuItems" 
                 :key="item.label" 
                 :href="item.href"
-                class="text-sm lg:text-base font-['Cinzel',serif] font-bold tracking-wider text-amber-100/90 hover:text-[#c5a059] transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#c5a059] hover:after:w-full after:transition-all"
+                @click.prevent="navigateToSection(item.href, item.label)"
+                :class="[
+                  'px-3 py-2 rounded-lg font-[\'Cinzel\',serif] text-xs font-bold tracking-wider transition-all flex items-center gap-2 cursor-pointer border',
+                  currentSectionHref === item.href 
+                    ? 'bg-[#c5a059]/20 text-[#c5a059] border-[#c5a059]/40' 
+                    : 'bg-[#051f18]/80 text-amber-100/90 border-[#c5a059]/15 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
+                ]"
               >
-                {{ item.label }}
+                <component :is="item.icon" class="w-3.5 h-3.5 text-[#c5a059] shrink-0" />
+                <span class="truncate">{{ item.label }}</span>
               </a>
-            </nav>
-            <div class="lg:hidden text-amber-100/80 font-['Cinzel',serif] text-sm font-bold tracking-wider">
-              SILLERICO & ABOGADOS
-            </div>
-
-            <!-- Botones de Acción -->
-            <div class="flex items-center gap-3">
             </div>
           </div>
 
@@ -532,115 +625,112 @@ const galleryImages = [
       </div>
     </header>
 
-    <!-- 3. SECCIÓN HERO PRINCIPAL (PREMIUM PRESENTATION WITH LOGO BACKGROUND) -->
-    <section class="relative w-full overflow-x-hidden py-14 lg:py-20 flex items-center justify-center bg-[#082a20] border-b border-[#c5a059]/10">
+    <!-- 3. SECCIÓN HERO PRINCIPAL -->
+    <section class="relative w-full overflow-hidden pt-[5px] pb-10 lg:pt-[5px] lg:pb-12 flex flex-col items-center justify-center bg-[#082a20] border-b border-[#c5a059]/10">
       
-      <!-- Logo Background Wrapper -->
-      <div class="absolute inset-y-0 right-0 w-full lg:w-[48%] z-0 pointer-events-none overflow-hidden">
-        <!-- Logo Image: cover background spanning full right side, borderless and bright colors -->
-        <div class="absolute inset-0 bg-[url('/images/logo-main.jpg')] bg-no-repeat bg-right bg-cover opacity-100 filter brightness-105 contrast-100"></div>
-        
-        <!-- Gradient overlay that ONLY fades the left edge of the image to blend it with the left column -->
-        <div class="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-[#082a20] to-transparent"></div>
-        <!-- Soft top/bottom edge blending -->
-        <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#082a20] to-transparent"></div>
-        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#082a20] to-transparent"></div>
-        
-        <!-- Subtle Decorative Background Circles -->
-        <div class="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl"></div>
-        <div class="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl"></div>
+      <!-- Fondo sutil de iluminación esmeralda/dorada -->
+      <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#c5a059]/5 blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl"></div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-4 md:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-        <!-- Hero Text content, taking more width (8 columns) and positioned on the left/center -->
-        <div class="lg:col-span-8 xl:col-span-7 flex flex-col items-start text-left space-y-8">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 w-full flex flex-col items-center text-center relative z-10 space-y-6">
+        
+        <!-- Logo Central + Motto Badge Sobrepuesto en la Parte Superior -->
+        <div class="relative w-full flex flex-col items-center justify-center pt-2">
           
-          <!-- Motto (Mobile only) -->
-          <div class="lg:hidden inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/50 border border-[#c5a059]/30 text-xs font-semibold text-amber-200/90 shadow-md">
-            <Scale class="w-3.5 h-3.5 text-[#c5a059]" />
-            <span class="font-['Cinzel',serif] italic tracking-wider">“Liderazgo jurídico y compromiso institucional”</span>
-          </div>
-
-          <!-- Title (Slightly Smaller Font Size) -->
-          <h1 class="font-['Cinzel',serif] text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#c5a059] leading-[1.15] animate-on-reveal delay-300 drop-shadow-md">
-            Sillerico & Asociados <br />
-            <span class="text-neutral-100 dark:text-white text-2xl sm:text-3xl md:text-4xl font-light font-['Playfair_Display',serif]">Firma de Abogados Elite</span>
-          </h1>
-
-          <!-- Pestañas Interactivas del Reglamento (Larger Text, Padding and Fixed Heights to prevent shifting) -->
-          <div class="w-full bg-[#051f18]/45 border border-[#c5a059]/25 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl backdrop-blur-md animate-on-reveal delay-400 h-[510px] sm:h-[340px] lg:h-[310px] flex flex-col justify-between">
-            <!-- Botones de Pestañas -->
-            <div class="flex border-b border-[#c5a059]/20 pb-2 gap-4 shrink-0">
-              <button 
-                @click="activeTab = 'mision'"
-                :class="[
-                  'px-5 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
-                  activeTab === 'mision' 
-                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/5' 
-                    : 'text-neutral-400 border-transparent hover:text-amber-100'
-                ]"
-              >
-                Misión
-              </button>
-              <button 
-                @click="activeTab = 'vision'"
-                :class="[
-                  'px-5 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
-                  activeTab === 'vision' 
-                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/5' 
-                    : 'text-neutral-400 border-transparent hover:text-amber-100'
-                ]"
-              >
-                Visión
-              </button>
-              <button 
-                @click="activeTab = 'principios'"
-                :class="[
-                  'px-5 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
-                  activeTab === 'principios' 
-                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/5' 
-                    : 'text-neutral-400 border-transparent hover:text-amber-100'
-                ]"
-              >
-                Principios
-              </button>
-            </div>
-
-            <!-- Contenido de Misión/Visión (Fixed Height) -->
-            <div v-if="activeTab === 'mision' || activeTab === 'vision'" class="space-y-3 h-[320px] sm:h-[180px] lg:h-[160px] flex flex-col justify-center transition-all duration-300 flex-1">
-              <h3 class="font-['Cinzel',serif] text-sm md:text-base font-bold text-[#c5a059] tracking-widest uppercase">
-                {{ reglamentoTabs[activeTab].title }}
-              </h3>
-              <p class="text-sm md:text-base text-neutral-200 font-light leading-relaxed">
-                {{ reglamentoTabs[activeTab].content }}
-              </p>
-            </div>
-
-            <!-- Contenido de Principios (Fixed Height with scrollable grid for absolute safety) -->
-            <div v-else-if="activeTab === 'principios'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-[320px] sm:h-[180px] lg:h-[160px] overflow-y-auto transition-all duration-300 flex-1 custom-scrollbar">
-              <div 
-                v-for="p in reglamentoTabs.principios" 
-                :key="p.title"
-                class="flex flex-col p-3.5 bg-[#082a20]/60 rounded-xl border border-[#c5a059]/15 shadow-sm"
-              >
-                <span class="text-sm font-bold text-[#c5a059] font-['Cinzel',serif]">{{ p.title }}</span>
-                <span class="text-xs text-neutral-300 font-light mt-1 leading-normal">{{ p.desc }}</span>
-              </div>
+          <!-- 1. Recuadro de Motto sobrepuesto en la parte superior del Logo (Posicionado adecuadamente debajo del menú) -->
+          <div class="z-20 -mb-6 sm:-mb-8 animate-on-reveal delay-100 flex items-center justify-center">
+            <div class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-[#051f18]/95 border border-[#c5a059]/45 text-xs sm:text-sm font-semibold text-amber-200/95 shadow-2xl backdrop-blur-md">
+              <Scale class="w-4 h-4 text-[#c5a059]" />
+              <span class="font-['Cinzel',serif] italic tracking-wider">“Liderazgo jurídico y compromiso institucional”</span>
             </div>
           </div>
 
-          <!-- Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2 animate-on-reveal delay-500">
+          <!-- 2. Logo Central (Perfecto como está) -->
+          <div class="animate-on-reveal delay-200 z-10 w-full max-w-2xl md:max-w-3xl lg:max-w-4xl flex items-center justify-center overflow-hidden [clip-path:inset(40px_0_40px_0)] my-[-40px]">
+            <img 
+              src="/images/logo-main.jpg" 
+              alt="Sillerico & Asociados - Emblema Principal" 
+              class="w-full h-auto max-h-[380px] sm:max-h-[470px] md:max-h-[560px] lg:max-h-[630px] object-cover object-center filter brightness-110 contrast-110 [mask-image:radial-gradient(ellipse_70%_65%_at_50%_50%,black_25%,transparent_82%)] [-webkit-mask-image:radial-gradient(ellipse_70%_65%_at_50%_50%,black_25%,transparent_82%)] scale-115"
+            />
+          </div>
+
+        </div>
+
+        <!-- 3. Recuadro de Letras (Misión, Visión, Principios) + Botones (Con el ancho estándar de las secciones max-w-6xl) -->
+        <div class="-mt-20 sm:-mt-24 md:-mt-28 z-20 relative w-full max-w-6xl bg-[#051f18]/85 border border-[#c5a059]/35 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl backdrop-blur-md animate-on-reveal delay-300 flex flex-col justify-between">
+          <!-- Botones de Pestañas (Misión / Visión / Principios) -->
+          <div class="flex justify-center border-b border-[#c5a059]/20 pb-2 gap-4 shrink-0">
+            <button 
+              @click="activeTab = 'mision'"
+              :class="[
+                'px-6 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
+                activeTab === 'mision' 
+                  ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10' 
+                  : 'text-neutral-400 border-transparent hover:text-amber-100'
+              ]"
+            >
+              Misión
+            </button>
+            <button 
+              @click="activeTab = 'vision'"
+              :class="[
+                'px-6 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
+                activeTab === 'vision' 
+                  ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10' 
+                  : 'text-neutral-400 border-transparent hover:text-amber-100'
+              ]"
+            >
+              Visión
+            </button>
+            <button 
+              @click="activeTab = 'principios'"
+              :class="[
+                'px-6 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
+                activeTab === 'principios' 
+                  ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10' 
+                  : 'text-neutral-400 border-transparent hover:text-amber-100'
+              ]"
+            >
+              Principios
+            </button>
+          </div>
+
+          <!-- Contenido Misión / Visión -->
+          <div v-if="activeTab === 'mision' || activeTab === 'vision'" class="space-y-3 min-h-[140px] flex flex-col justify-center text-center transition-all duration-300">
+            <h3 class="font-['Cinzel',serif] text-sm md:text-base font-bold text-[#c5a059] tracking-widest uppercase">
+              {{ reglamentoTabs[activeTab].title }}
+            </h3>
+            <p class="text-sm md:text-base text-neutral-200 font-light leading-relaxed text-justify px-2 md:px-4">
+              {{ reglamentoTabs[activeTab].content }}
+            </p>
+          </div>
+
+          <!-- Contenido Principios -->
+          <div v-else-if="activeTab === 'principios'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 min-h-[140px] items-center transition-all duration-300">
+            <div 
+              v-for="p in reglamentoTabs.principios" 
+              :key="p.title"
+              class="flex flex-col p-3.5 bg-[#082a20]/80 rounded-xl border border-[#c5a059]/20 shadow-sm text-left"
+            >
+              <span class="text-xs font-bold text-[#c5a059] font-['Cinzel',serif]">{{ p.title }}</span>
+              <span class="text-[11px] text-neutral-300 font-light mt-1 leading-normal">{{ p.desc }}</span>
+            </div>
+          </div>
+
+          <!-- Botones de Acción Integrados al Pie del Recuadro -->
+          <div class="pt-4 border-t border-[#c5a059]/20 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
             <button 
               @click="isReglamentoModalOpen = true"
-              class="w-full sm:w-auto text-center bg-transparent border border-[#c5a059] hover:bg-[#c5a059]/10 text-[#c5a059] font-bold px-10 py-4 rounded-lg text-sm md:text-base tracking-wider transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-lg"
+              class="w-full sm:w-auto bg-transparent border border-[#c5a059] hover:bg-[#c5a059]/10 text-[#c5a059] font-bold px-8 py-3.5 rounded-lg text-sm md:text-base tracking-wider transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-lg"
             >
               <FileText class="w-5 h-5" />
               <span>Reglamento Interno</span>
             </button>
             <button 
               @click="scrollToContact"
-              class="w-full sm:w-auto text-center bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-10 py-4 rounded-lg text-sm md:text-base tracking-wider transition-all shadow-xl shadow-emerald-950/20 active:scale-98 flex items-center justify-center gap-2.5 cursor-pointer"
+              class="w-full sm:w-auto bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-8 py-3.5 rounded-lg text-sm md:text-base tracking-wider transition-all shadow-xl shadow-emerald-950/20 active:scale-98 flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <span>Agendar una Consulta</span>
               <ChevronRight class="w-5 h-5" />
@@ -648,25 +738,6 @@ const galleryImages = [
           </div>
         </div>
 
-        <!-- Right Column containing Motto and Acreditación, centered horizontally relative to the logo -->
-        <div class="lg:col-span-4 xl:col-span-5 hidden lg:flex flex-col justify-end relative animate-on-reveal delay-500 min-h-[300px] z-10">
-          <!-- Motto aligned to the top-center, positioned higher to clear the logo -->
-          <div class="absolute -top-32 left-1/2 -translate-x-1/2 bg-[#051f18]/95 border border-[#c5a059]/30 px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 backdrop-blur-md z-30 whitespace-nowrap">
-            <Scale class="w-4 h-4 text-[#c5a059]" />
-            <span class="font-['Cinzel',serif] text-xs font-semibold text-amber-200/90 italic tracking-wider">
-              “Liderazgo jurídico y compromiso institucional”
-            </span>
-          </div>
-
-          <!-- Bottom-center Badge: Acreditación, positioned lower to clear the logo -->
-          <div class="absolute -bottom-24 left-1/2 -translate-x-1/2 bg-[#051f18]/95 border border-[#c5a059]/30 px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 backdrop-blur-md z-30 whitespace-nowrap">
-            <span class="text-2xl">⭐</span>
-            <div class="flex flex-col text-left">
-              <span class="text-[10px] uppercase font-bold text-amber-200/70 tracking-widest leading-none">Acreditación Oficial</span>
-              <span class="text-sm font-bold text-white mt-1">Firma Jurídica de Referencia</span>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -1386,7 +1457,11 @@ const galleryImages = [
           <h3 class="font-['Cinzel',serif] text-sm font-bold tracking-widest text-[#c5a059] uppercase">Mapa de Sitio</h3>
           <ul class="space-y-2">
             <li v-for="item in menuItems" :key="item.label">
-              <a :href="item.href" class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 font-light">
+              <a 
+                :href="item.href" 
+                @click.prevent="navigateToSection(item.href, item.label)"
+                class="text-neutral-400 hover:text-[#c5a059] transition-colors flex items-center gap-1.5 font-light cursor-pointer"
+              >
                 <ChevronRight class="w-3.5 h-3.5 text-[#c5a059]" />
                 <span>{{ item.label }}</span>
               </a>
@@ -1500,6 +1575,45 @@ const galleryImages = [
 
     <SplashScreen :show="showSplash" @reveal="handleSplashReveal" @finish="handleSplashFinish" />
 
+    <!-- 12. CURTAIN TRANSITION OVERLAY (TRANSICIÓN DE CORTINA ENTRE MENÚS) -->
+    <div 
+      v-if="isCurtainActive" 
+      class="fixed inset-0 z-[9999] pointer-events-auto overflow-hidden flex items-center justify-center"
+    >
+      <!-- Sliding Panel -->
+      <div 
+        class="absolute inset-0 bg-gradient-to-br from-[#03150f] via-[#082a20] to-[#020d09] flex flex-col items-center justify-center shadow-2xl transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)]"
+        :style="{
+          transform: 
+            curtainDirection === 'l2r'
+              ? (curtainPhase === 'idle' ? 'translateX(-100%)' : (curtainPhase === 'uncovering' ? 'translateX(100%)' : 'translateX(0%)'))
+              : (curtainPhase === 'idle' ? 'translateX(100%)' : (curtainPhase === 'uncovering' ? 'translateX(-100%)' : 'translateX(0%)'))
+        }"
+      >
+        <!-- Shining Gold Leading Edge Line -->
+        <div 
+          :class="[
+            'absolute top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#c5a059] via-amber-200 to-[#c5a059] shadow-[0_0_35px_#c5a059]',
+            curtainDirection === 'l2r' ? 'right-0' : 'left-0'
+          ]"
+        ></div>
+
+        <!-- Faint Radial Background Glow -->
+        <div class="absolute w-[600px] h-[600px] rounded-full bg-[#c5a059]/15 blur-3xl pointer-events-none"></div>
+
+        <!-- Center Vertical Logo Image inside Curtain (logo-main.jpg sin texto) -->
+        <div class="relative z-10 flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-300">
+          <div class="relative max-h-[70vh] max-w-[85vw] sm:max-w-md rounded-2xl bg-[#051f18]/90 border-2 border-[#c5a059]/50 shadow-[0_0_60px_rgba(197,160,89,0.45)] flex items-center justify-center p-3 backdrop-blur-md overflow-hidden">
+            <img 
+              src="/images/logo-main.jpg" 
+              alt="Sillerico & Abogados Logo Principal" 
+              class="max-h-[55vh] sm:max-h-[60vh] w-auto object-contain rounded-xl filter drop-shadow-[0_6px_20px_rgba(0,0,0,0.7)]"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -1510,6 +1624,15 @@ const galleryImages = [
 }
 html {
   scroll-behavior: smooth;
+}
+
+/* Justificación tipográfica uniforme en todos los párrafos del sitio */
+p {
+  text-align: justify;
+  text-justify: inter-word;
+}
+.text-center p, p.text-center {
+  text-align: center;
 }
 
 /* Fade in animation (no translate Y transition for perfect logo landing) */
