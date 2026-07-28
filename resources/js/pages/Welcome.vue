@@ -48,7 +48,7 @@ const handleSplashFinish = () => {
 
 // State for Article/Laws Filter
 const searchKeyword = ref('');
-const selectedCategory = ref('todos');
+const selectedCategory = ref('articulos');
 
 // State for Gallery Carousel
 const activeImageIndex = ref(0);
@@ -266,16 +266,16 @@ const contactLinks = {
 };
 
 const featuredService = {
-  title: 'Derecho Penal y Defensa Litigante',
-  description: 'Defensa penal corporativa y personal rigurosa ante tribunales nacionales, con especialización en delitos financieros, patrimoniales y procesal penal de alta complejidad. Ofrecemos representación legal estratégica en todas las etapas del proceso de litigio penal.',
+  title: 'Derecho Penal y Procesal Penal',
+  description: 'Brindamos defensa técnica especializada y asesoría preventiva en materia penal, diseñando estrategias jurídicas orientadas a proteger los derechos de nuestros clientes, minimizar riesgos legales y garantizar una representación efectiva en todas las etapas del proceso penal.',
   icon: '⚜️',
   highlights: ['Litigios penales', 'Delitos corporativos', 'Apelaciones y recursos', 'Derecho procesal penal', 'Criminal compliance']
 };
 
 const services = [
   {
-    title: 'Derecho Corporativo y Empresarial',
-    description: 'Asesoramiento integral en constitución de sociedades, fusiones y adquisiciones, estructuración corporativa y cumplimiento legal empresarial.',
+    title: 'Derecho Comercial y Corporativo',
+    description: 'Acompañamos a empresas y emprendedores en cada etapa de su desarrollo, proporcionando asesoría estratégica, gobierno corporativo, elaboración de contratos y prevención de contingencias legales que fortalezcan la estabilidad y el crecimiento de sus negocios.',
     icon: '⚖️',
     highlights: ['Gobierno corporativo', 'Contratos comerciales', 'Propiedad societaria']
   },
@@ -292,8 +292,8 @@ const services = [
     highlights: ['Registro de marcas', 'Derechos de autor', 'Secretos comerciales']
   },
   {
-    title: 'Derecho Laboral y Social',
-    description: 'Asesoría en contratos de trabajo, reestructuraciones salariales, representación ante ministerios del ramo, y prevención de contingencias laborales patronales.',
+    title: 'Derecho Laboral y Seguridad Social',
+    description: 'Asesoramos a empleadores y trabajadores en la adecuada gestión de las relaciones laborales, promoviendo el cumplimiento de la normativa vigente, la prevención de conflictos y la defensa eficaz de sus derechos e intereses.',
     icon: '👔',
     highlights: ['Negociación colectiva', 'Seguridad social', 'Defensa patronal']
   },
@@ -305,23 +305,28 @@ const services = [
   },
   {
     title: 'Derecho Constitucional y Derechos Humanos',
-    description: 'Asesoramiento y representación legal en la interposición de recursos constitucionales, acciones de amparo, acciones de libertad y la defensa ante organismos internacionales.',
+    description: 'Protegemos los derechos fundamentales mediante acciones constitucionales, asesoría especializada y estrategias preventivas que aseguran el respeto de las garantías constitucionales y el cumplimiento de los estándares nacionales e internacionales de derechos humanos.',
     icon: '🏛️',
     highlights: ['Amparo constitucional', 'Acciones de libertad', 'Corte Interamericana']
   },
   {
-    title: 'Derecho Civil y Constitucional',
-    description: 'Defensa estratégica en contratos, propiedad, obligaciones, responsabilidad civil y litigios civiles de alta complejidad fundamentados en las garantías constitucionales.',
+    title: 'Derecho Civil y Contractual',
+    description: 'Ofrecemos soluciones jurídicas integrales para la elaboración, revisión y ejecución de contratos, así como la prevención y resolución de conflictos civiles, brindando seguridad jurídica en las relaciones patrimoniales y comerciales.',
     icon: '📜',
     highlights: ['Contratos y obligaciones', 'Derechos reales', 'Responsabilidad civil']
   },
   {
     title: 'Derecho Tributario y Aduanero',
-    description: 'Patrocinio en procesos de fiscalización tributaria, impugnación de resoluciones administrativas ante la AIT y planificación fiscal preventiva para empresas.',
+    description: 'Brindamos asesoramiento especializado en planificación tributaria, cumplimiento normativo y defensa administrativa y judicial, orientando a nuestros clientes hacia una gestión fiscal segura, eficiente y preventiva frente a riesgos tributarios y aduaneros.',
     icon: '📊',
     highlights: ['Impugnación tributaria', 'Planificación fiscal', 'Procesos aduaneros']
   }
 ];
+
+const getServiceWhatsappUrl = (serviceTitle: string) => {
+  const message = `Estoy interesado en su servicio de ${serviceTitle}`;
+  return `${contactLinks.whatsapp}?text=${encodeURIComponent(message)}`;
+};
 
 const publications = ref([
   {
@@ -473,32 +478,46 @@ const partners = [
   }
 ];
 
+const visiblePartners = computed(() => {
+  return partners.filter(p => !p.name.includes('Alan Sillerico'));
+});
+
+const getPartnerWhatsappUrl = (partnerName: string) => {
+  const message = `Hola, quisiera agendar una consulta con ${partnerName}`;
+  return `${contactLinks.whatsapp}?text=${encodeURIComponent(message)}`;
+};
+
 const galleryImages = [
   {
-    title: 'Oficina Principal - Sala de Firmas',
-    desc: 'Espacio elegante con luz natural y acabados de lujo para concretar transacciones de alto perfil corporativo.',
-    src: '/images/gallery_signing_room.png'
+    title: 'Despacho de Presidencia y Dirección General',
+    desc: 'Espacio ejecutivo diseñado con solemnidad e iluminación cálida, concebido para el análisis de casos complejos y la alta dirección estratégica.',
+    src: '/images/galeria01.png'
   },
   {
-    title: 'Sala de Conferencias y Arbitrajes',
-    desc: 'Equipada con tecnología avanzada para sesiones de mediación y videoconferencias internacionales seguras.',
-    src: '/images/gallery_conference.png'
+    title: 'Sala Principal de Directorio y Arbitrajes',
+    desc: 'Infraestructura corporativa de alto nivel para reuniones del consejo, negociaciones de fusiones y audiencias de mediación confidencial.',
+    src: '/images/galeria02.png'
   },
   {
-    title: 'Nuestra Biblioteca Jurídica',
-    desc: 'Un archivo completo con colecciones históricas y modernas de jurisprudencia civil, penal e internacional.',
-    src: '/images/gallery_library.png'
+    title: 'Área de Consultoría y Atención a Clientes',
+    desc: 'Ambiente distinguido y confortable enfocado en brindar una atención personalizada, privada y con la máxima reserva profesional.',
+    src: '/images/galeria03.png'
   },
   {
-    title: 'Zona de Recepción y Consultas',
-    desc: 'Diseño sobrio y acogedor diseñado para brindar la mayor confidencialidad y bienestar a nuestros distinguidos clientes.',
-    src: '/images/gallery_reception.png'
+    title: 'Centro de Análisis e Investigación Jurídica',
+    desc: 'Área reservada para el estudio multidisciplinario de doctrinas, jurisprudencia y preparación rigurosa de estrategias procesales.',
+    src: '/images/galeria04.png'
+  },
+  {
+    title: 'Recepción Corporativa e Instalaciones',
+    desc: 'Instalaciones modernas que combinan la distinción del derecho clásico con la vanguardia arquitectónica en el corazón de La Paz.',
+    src: '/images/galeria05.png'
   }
 ];
 </script>
 
 <template>
-  <Head title="Sillerico & Abogados - Firma de Abogados">
+  <Head title="Sillerico & Asociados - Firma de Abogados">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -515,7 +534,7 @@ const galleryImages = [
           <img 
             id="header-logo-box" 
             src="/images/logo-splash.png" 
-            alt="Sillerico & Abogados" 
+            alt="Sillerico & Asociados" 
             class="h-32 w-32 md:h-40 md:w-40 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] relative -mt-3 -mb-12 md:-mt-5 md:-mb-16"
           />
         </a>
@@ -560,8 +579,10 @@ const galleryImages = [
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
               </a>
-                <!-- Sistema link -->
-                <a href="http://localhost:8090/" target="_blank" class="ml-2 text-sm font-bold text-amber-100 hover:text-[#c5a059] transition-colors" title="Ir al Sistema">Sistema</a>
+              <!-- Sistema (Acceso al Sistema) -->
+              <a href="http://localhost:8090/" target="_blank" class="w-7 h-7 rounded-full bg-[#c5a059] hover:bg-[#d6b46c] flex items-center justify-center text-emerald-950 transition-all duration-300 hover:scale-110 shadow-md" title="Acceso al Sistema">
+                <Monitor class="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
 
@@ -588,7 +609,7 @@ const galleryImages = [
               <!-- Navigation Bar (Mobile Header) -->
               <div class="lg:hidden flex items-center justify-between w-full">
                 <span class="text-amber-100/90 font-['Cinzel',serif] text-sm font-bold tracking-wider">
-                  SILLERICO & ABOGADOS
+                  SILLERICO & ASOCIADOS
                 </span>
                 <button 
                   @click="isMobileMenuOpen = !isMobileMenuOpen" 
@@ -602,21 +623,21 @@ const galleryImages = [
             </div>
 
             <!-- Mobile Navigation Drawer -->
-            <div v-if="isMobileMenuOpen" class="lg:hidden mt-3 pt-3 border-t border-[#c5a059]/20 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div v-if="isMobileMenuOpen" class="lg:hidden mt-3 pt-3 border-t border-[#c5a059]/20 flex flex-col space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
               <a 
                 v-for="item in menuItems" 
                 :key="item.label" 
                 :href="item.href"
                 @click.prevent="navigateToSection(item.href, item.label)"
                 :class="[
-                  'px-3 py-2 rounded-lg font-[\'Cinzel\',serif] text-xs font-bold tracking-wider transition-all flex items-center gap-2 cursor-pointer border',
+                  'w-full px-4 py-2.5 rounded-xl font-[\'Cinzel\',serif] text-xs sm:text-sm font-bold tracking-wider transition-all flex items-center gap-3 cursor-pointer border',
                   currentSectionHref === item.href 
-                    ? 'bg-[#c5a059]/20 text-[#c5a059] border-[#c5a059]/40' 
-                    : 'bg-[#051f18]/80 text-amber-100/90 border-[#c5a059]/15 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
+                    ? 'bg-[#c5a059]/20 text-[#c5a059] border-[#c5a059]/40 shadow-sm' 
+                    : 'bg-[#051f18]/90 text-amber-100/95 border-[#c5a059]/15 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
                 ]"
               >
-                <component :is="item.icon" class="w-3.5 h-3.5 text-[#c5a059] shrink-0" />
-                <span class="truncate">{{ item.label }}</span>
+                <component :is="item.icon" class="w-4 h-4 text-[#c5a059] shrink-0" />
+                <span class="whitespace-normal leading-tight">{{ item.label }}</span>
               </a>
             </div>
           </div>
@@ -658,69 +679,25 @@ const galleryImages = [
 
         </div>
 
-        <!-- 3. Recuadro de Letras (Misión, Visión, Principios) + Botones (Con el ancho estándar de las secciones max-w-6xl) -->
-        <div class="-mt-20 sm:-mt-24 md:-mt-28 z-20 relative w-full max-w-6xl bg-[#051f18]/85 border border-[#c5a059]/35 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl backdrop-blur-md animate-on-reveal delay-300 flex flex-col justify-between">
-          <!-- Botones de Pestañas (Misión / Visión / Principios) -->
-          <div class="flex justify-center border-b border-[#c5a059]/20 pb-2 gap-4 shrink-0">
-            <button 
-              @click="activeTab = 'mision'"
-              :class="[
-                'px-6 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
-                activeTab === 'mision' 
-                  ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10' 
-                  : 'text-neutral-400 border-transparent hover:text-amber-100'
-              ]"
-            >
-              Misión
-            </button>
-            <button 
-              @click="activeTab = 'vision'"
-              :class="[
-                'px-6 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
-                activeTab === 'vision' 
-                  ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10' 
-                  : 'text-neutral-400 border-transparent hover:text-amber-100'
-              ]"
-            >
-              Visión
-            </button>
-            <button 
-              @click="activeTab = 'principios'"
-              :class="[
-                'px-6 py-2.5 text-xs sm:text-sm md:text-base font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer',
-                activeTab === 'principios' 
-                  ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10' 
-                  : 'text-neutral-400 border-transparent hover:text-amber-100'
-              ]"
-            >
-              Principios
-            </button>
-          </div>
+        <!-- 3. Recuadro de Declaración Institucional + Botones (Con el ancho estándar max-w-6xl) -->
+        <div class="-mt-20 sm:-mt-24 md:-mt-28 z-20 relative w-full max-w-6xl bg-[#051f18]/85 border border-[#c5a059]/35 rounded-2xl p-6 md:p-10 space-y-6 shadow-2xl backdrop-blur-md animate-on-reveal delay-300 flex flex-col justify-between">
+          
+          <!-- Mensaje Institucional de Visión Preventiva -->
+          <div class="space-y-4 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#c5a059]/10 border border-[#c5a059]/30 text-xs font-semibold text-[#c5a059] uppercase tracking-widest">
+              <Scale class="w-3.5 h-3.5" />
+              <span class="font-['Cinzel',serif] text-xs">Visión Jurídica Preventiva</span>
+            </div>
 
-          <!-- Contenido Misión / Visión -->
-          <div v-if="activeTab === 'mision' || activeTab === 'vision'" class="space-y-3 min-h-[140px] flex flex-col justify-center text-center transition-all duration-300">
-            <h3 class="font-['Cinzel',serif] text-sm md:text-base font-bold text-[#c5a059] tracking-widest uppercase">
-              {{ reglamentoTabs[activeTab].title }}
-            </h3>
-            <p class="text-sm md:text-base text-neutral-200 font-light leading-relaxed text-justify px-2 md:px-4">
-              {{ reglamentoTabs[activeTab].content }}
-            </p>
-          </div>
-
-          <!-- Contenido Principios -->
-          <div v-else-if="activeTab === 'principios'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 min-h-[140px] items-center transition-all duration-300">
-            <div 
-              v-for="p in reglamentoTabs.principios" 
-              :key="p.title"
-              class="flex flex-col p-3.5 bg-[#082a20]/80 rounded-xl border border-[#c5a059]/20 shadow-sm text-left"
-            >
-              <span class="text-xs font-bold text-[#c5a059] font-['Cinzel',serif]">{{ p.title }}</span>
-              <span class="text-[11px] text-neutral-300 font-light mt-1 leading-normal">{{ p.desc }}</span>
+            <div class="relative px-2 sm:px-6 md:px-10 py-1">
+              <p class="font-['Cinzel',serif] text-sm sm:text-base md:text-lg lg:text-xl text-neutral-100 font-normal leading-relaxed md:leading-loose text-justify sm:text-center">
+                En <strong class="text-[#c5a059] font-semibold">SILLERICO & ASOCIADOS</strong> entendemos que <span class="text-amber-200 italic font-semibold">el mejor litigio es aquel que pudo evitarse</span>. Por ello, complementamos nuestra experiencia en representación judicial con una sólida visión preventiva, orientada a identificar riesgos, fortalecer la seguridad jurídica y ofrecer soluciones estratégicas que protejan los intereses de nuestros clientes antes, durante y después de cada decisión.
+              </p>
             </div>
           </div>
 
           <!-- Botones de Acción Integrados al Pie del Recuadro -->
-          <div class="pt-4 border-t border-[#c5a059]/20 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+          <div class="pt-6 border-t border-[#c5a059]/20 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
             <button 
               @click="isReglamentoModalOpen = true"
               class="w-full sm:w-auto bg-transparent border border-[#c5a059] hover:bg-[#c5a059]/10 text-[#c5a059] font-bold px-8 py-3.5 rounded-lg text-sm md:text-base tracking-wider transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-lg"
@@ -781,13 +758,15 @@ const galleryImages = [
             </div>
             
             <div class="pt-4 flex flex-wrap gap-4 items-center">
-              <button 
-                @click="scrollToContact"
-                class="bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-6 py-3 rounded-lg text-xs md:text-sm tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
+              <a 
+                :href="getServiceWhatsappUrl(featuredService.title)"
+                target="_blank"
+                class="bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 font-bold px-6 py-3 rounded-lg text-xs md:text-sm tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer group/btn"
               >
-                <span>Solicitar Defensa Penal</span>
-                <ChevronRight class="w-4 h-4" />
-              </button>
+                <MessageSquare class="w-4 h-4" />
+                <span>Contactar</span>
+                <ChevronRight class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+              </a>
             </div>
           </div>
           
@@ -843,9 +822,17 @@ const galleryImages = [
             </span>
           </div>
 
-          <!-- Bottom arrow decorative -->
-          <div class="absolute bottom-4 right-4 text-neutral-400 group-hover:text-[#c5a059] group-hover:translate-x-1 transition-all duration-300">
-            <ChevronRight class="w-5 h-5" />
+          <!-- Botón Contactar al pie del cuadro -->
+          <div class="mt-6 pt-4 border-t border-[#c5a059]/15 z-10">
+            <a 
+              :href="getServiceWhatsappUrl(service.title)"
+              target="_blank"
+              class="w-full bg-[#082a20] hover:bg-[#c5a059] text-[#c5a059] hover:text-emerald-950 font-bold px-4 py-2.5 rounded-lg text-xs md:text-sm tracking-wider transition-all duration-300 border border-[#c5a059]/40 hover:border-[#c5a059] shadow-md flex items-center justify-center gap-2 cursor-pointer group/btn"
+            >
+              <MessageSquare class="w-4 h-4" />
+              <span>Contactar</span>
+              <ChevronRight class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+            </a>
           </div>
         </div>
       </div>
@@ -877,41 +864,60 @@ const galleryImages = [
           </div>
         </div>
 
-        <!-- Interactive Category Switcher -->
-        <div class="flex flex-wrap gap-2 mb-8 border-b border-[#c5a059]/15 pb-4">
-          <button 
-            @click="selectedCategory = 'todos'"
-            :class="[
-              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all border',
-              selectedCategory === 'todos' 
-                ? 'bg-[#c5a059] text-[#082a20] border-[#c5a059]' 
-                : 'bg-[#0b3629]/40 hover:bg-[#0b3629]/60 border-[#c5a059]/15 text-amber-200/80'
-            ]"
-          >
-            Ver Todo
-          </button>
-          <button 
-            @click="selectedCategory = 'articulos'"
-            :class="[
-              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all border',
-              selectedCategory === 'articulos' 
-                ? 'bg-[#c5a059] text-[#082a20] border-[#c5a059]' 
-                : 'bg-[#0b3629]/40 hover:bg-[#0b3629]/60 border-[#c5a059]/15 text-amber-200/80'
-            ]"
-          >
-            Artículos Doctrinarios
-          </button>
-          <button 
-            @click="selectedCategory = 'normas'"
-            :class="[
-              'px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all border',
-              selectedCategory === 'normas' 
-                ? 'bg-[#c5a059] text-[#082a20] border-[#c5a059]' 
-                : 'bg-[#0b3629]/40 hover:bg-[#0b3629]/60 border-[#c5a059]/15 text-amber-200/80'
-            ]"
-          >
-            Leyes & Compendios
-          </button>
+        <!-- Segmented Button Group (Radio Group style) -->
+        <div class="mb-8 flex justify-start">
+          <div class="inline-flex p-1.5 bg-[#051f18]/80 dark:bg-neutral-900 border border-[#c5a059]/30 rounded-2xl shadow-xl backdrop-blur-md gap-1 flex-wrap sm:flex-nowrap">
+            <!-- 1. Artículos Doctrinarios -->
+            <button 
+              @click="selectedCategory = 'articulos'"
+              :class="[
+                'px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 flex items-center gap-2 cursor-pointer',
+                selectedCategory === 'articulos' 
+                  ? 'bg-gradient-to-r from-[#c5a059] to-[#d6b46c] text-emerald-950 font-bold shadow-md shadow-[#c5a059]/20 scale-[1.02]' 
+                  : 'text-amber-200/80 hover:text-amber-100 hover:bg-[#0b3629]/50'
+              ]"
+            >
+              <span 
+                class="size-2 rounded-full transition-all duration-300 shrink-0"
+                :class="selectedCategory === 'articulos' ? 'bg-emerald-950 scale-110' : 'bg-[#c5a059]/40'"
+              ></span>
+              <span>Artículos Doctrinarios</span>
+            </button>
+
+            <!-- 2. Leyes & Compendios -->
+            <button 
+              @click="selectedCategory = 'normas'"
+              :class="[
+                'px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 flex items-center gap-2 cursor-pointer',
+                selectedCategory === 'normas' 
+                  ? 'bg-gradient-to-r from-[#c5a059] to-[#d6b46c] text-emerald-950 font-bold shadow-md shadow-[#c5a059]/20 scale-[1.02]' 
+                  : 'text-amber-200/80 hover:text-amber-100 hover:bg-[#0b3629]/50'
+              ]"
+            >
+              <span 
+                class="size-2 rounded-full transition-all duration-300 shrink-0"
+                :class="selectedCategory === 'normas' ? 'bg-emerald-950 scale-110' : 'bg-[#c5a059]/40'"
+              ></span>
+              <span>Leyes & Compendios</span>
+            </button>
+
+            <!-- 3. Todos -->
+            <button 
+              @click="selectedCategory = 'todos'"
+              :class="[
+                'px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 flex items-center gap-2 cursor-pointer',
+                selectedCategory === 'todos' 
+                  ? 'bg-gradient-to-r from-[#c5a059] to-[#d6b46c] text-emerald-950 font-bold shadow-md shadow-[#c5a059]/20 scale-[1.02]' 
+                  : 'text-amber-200/80 hover:text-amber-100 hover:bg-[#0b3629]/50'
+              ]"
+            >
+              <span 
+                class="size-2 rounded-full transition-all duration-300 shrink-0"
+                :class="selectedCategory === 'todos' ? 'bg-emerald-950 scale-110' : 'bg-[#c5a059]/40'"
+              ></span>
+              <span>Todos</span>
+            </button>
+          </div>
         </div>
 
         <!-- Dynamic Grid List -->
@@ -1019,7 +1025,7 @@ const galleryImages = [
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div 
-          v-for="partner in partners" 
+          v-for="partner in visiblePartners" 
           :key="partner.name"
           class="bg-[#0b3629]/60 dark:bg-[#071619]/60 rounded-xl border border-[#c5a059]/20 dark:border-neutral-800/80 p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
         >
@@ -1067,13 +1073,14 @@ const galleryImages = [
 
           <div class="mt-6 pt-4 border-t border-[#c5a059]/15 dark:border-neutral-800/80 flex items-center justify-between">
             <span class="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">{{ partner.type || 'Socio' }}</span>
-            <button 
-              @click="scrollToContact"
+            <a 
+              :href="getPartnerWhatsappUrl(partner.name)"
+              target="_blank"
               class="text-xs font-bold text-[#c5a059] hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>Agendar cita</span>
               <ChevronRight class="w-3.5 h-3.5" />
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -1179,7 +1186,7 @@ const galleryImages = [
           <div class="space-y-3">
             <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Trayectoria y Liderazgo</span>
             <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
-              Sobre Sillerico & Abogados
+              Sobre Sillerico & Asociados
             </h2>
             <div class="w-16 h-[2px] bg-[#c5a059]"></div>
           </div>
@@ -1192,16 +1199,64 @@ const galleryImages = [
             Nuestro compromiso es siempre velar por sus intereses patrimoniales mediante soluciones preventivas estratégicas y, de ser necesario, una representación litigante de primer nivel ante todas las instancias judiciales y arbitrales.
           </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-            <div class="p-5 rounded-lg bg-[#0b3629]/60 border border-[#c5a059]/15">
-              <span class="text-lg">🏛️</span>
-              <h3 class="font-['Cinzel',serif] text-sm font-bold text-amber-200 mt-2 mb-1">Misión</h3>
-              <p class="text-[11px] text-neutral-300 font-light">Brindar asesoramiento integral con los más altos estándares éticos, protegiendo los activos patrimoniales y la paz social de nuestros representados.</p>
+          <!-- Tabbed Misión, Visión, Principios System -->
+          <div class="mt-6 bg-[#0b3629]/60 border border-[#c5a059]/25 rounded-2xl p-6 space-y-5 shadow-xl backdrop-blur-sm">
+            <div class="flex justify-start border-b border-[#c5a059]/20 pb-2 gap-3 overflow-x-auto">
+              <button 
+                @click="activeTab = 'mision'"
+                :class="[
+                  'px-5 py-2 text-xs sm:text-sm font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer whitespace-nowrap',
+                  activeTab === 'mision' 
+                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10 rounded-t-lg' 
+                    : 'text-neutral-400 border-transparent hover:text-amber-100'
+                ]"
+              >
+                Misión
+              </button>
+              <button 
+                @click="activeTab = 'vision'"
+                :class="[
+                  'px-5 py-2 text-xs sm:text-sm font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer whitespace-nowrap',
+                  activeTab === 'vision' 
+                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10 rounded-t-lg' 
+                    : 'text-neutral-400 border-transparent hover:text-amber-100'
+                ]"
+              >
+                Visión
+              </button>
+              <button 
+                @click="activeTab = 'principios'"
+                :class="[
+                  'px-5 py-2 text-xs sm:text-sm font-bold font-[\'Cinzel\',serif] tracking-wider transition-all border-b-2 cursor-pointer whitespace-nowrap',
+                  activeTab === 'principios' 
+                    ? 'text-[#c5a059] border-[#c5a059] bg-[#c5a059]/10 rounded-t-lg' 
+                    : 'text-neutral-400 border-transparent hover:text-amber-100'
+                ]"
+              >
+                Principios
+              </button>
             </div>
-            <div class="p-5 rounded-lg bg-[#0b3629]/60 border border-[#c5a059]/15">
-              <span class="text-lg">🚀</span>
-              <h3 class="font-['Cinzel',serif] text-sm font-bold text-amber-200 mt-2 mb-1">Visión</h3>
-              <p class="text-[11px] text-neutral-300 font-light">Ser reconocidos de forma permanente como la firma de abogados elite referente de Bolivia, líder en resolución de controversias mercantiles complejas.</p>
+
+            <!-- Tab Content Misión / Visión -->
+            <div v-if="activeTab === 'mision' || activeTab === 'vision'" class="space-y-2 min-h-[120px] flex flex-col justify-center transition-all duration-300">
+              <h4 class="font-['Cinzel',serif] text-xs font-bold text-[#c5a059] tracking-widest uppercase">
+                {{ reglamentoTabs[activeTab].title }}
+              </h4>
+              <p class="text-xs sm:text-sm text-neutral-200 font-light leading-relaxed text-justify">
+                {{ reglamentoTabs[activeTab].content }}
+              </p>
+            </div>
+
+            <!-- Tab Content Principios -->
+            <div v-else-if="activeTab === 'principios'" class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-h-[120px] items-center transition-all duration-300">
+              <div 
+                v-for="p in reglamentoTabs.principios" 
+                :key="p.title"
+                class="flex flex-col p-3 bg-[#082a20]/90 rounded-xl border border-[#c5a059]/20 shadow-sm"
+              >
+                <span class="text-xs font-bold text-[#c5a059] font-['Cinzel',serif]">{{ p.title }}</span>
+                <span class="text-[11px] text-neutral-300 font-light mt-1 leading-normal">{{ p.desc }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1243,7 +1298,7 @@ const galleryImages = [
           </div>
 
           <div class="mt-8 pt-6 border-t border-white/10 z-10 flex justify-between items-center text-xs text-neutral-300">
-            <span>S&A • SILLERICO & ABOGADOS</span>
+            <span>S&A • SILLERICO & ASOCIADOS</span>
             <Scale class="w-4 h-4 text-[#c5a059]" />
           </div>
         </div>
@@ -1310,14 +1365,14 @@ const galleryImages = [
                   v-model="contactForm.area"
                   class="w-full text-xs sm:text-sm bg-[#051f18]/40 dark:bg-neutral-800 border border-[#c5a059]/20 dark:border-neutral-700 rounded-lg p-3 focus:outline-none focus:border-[#c5a059] transition-all text-neutral-100 dark:text-white"
                 >
-                  <option>Derecho Corporativo y Empresarial</option>
+                  <option>Derecho Comercial y Corporativo</option>
                   <option>Derecho de Familia y Sucesiones</option>
                   <option>Propiedad Intelectual y Patentes</option>
-                  <option>Derecho Penal y Defensa Litigante</option>
-                  <option>Derecho Laboral y Social</option>
+                  <option>Derecho Penal y Procesal Penal</option>
+                  <option>Derecho Laboral y Seguridad Social</option>
                   <option>Arbitraje y Resolución de Conflictos</option>
                   <option>Derecho Constitucional y Derechos Humanos</option>
-                  <option>Derecho Civil y Constitucional</option>
+                  <option>Derecho Civil y Contractual</option>
                   <option>Derecho Tributario y Aduanero</option>
                 </select>
               </div>
@@ -1348,7 +1403,7 @@ const galleryImages = [
               ✓
             </div>
             <h4 class="font-['Cinzel',serif] text-base font-bold text-neutral-800 dark:text-[#c5a059]">¡Solicitud Recibida!</h4>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto font-light leading-relaxed">Un asesor legal de Sillerico & Abogados se contactará contigo por teléfono o WhatsApp de forma inmediata.</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto font-light leading-relaxed">Un asesor legal de Sillerico & Asociados se contactará contigo por teléfono o WhatsApp de forma inmediata.</p>
           </div>
         </div>
 
@@ -1426,10 +1481,10 @@ const galleryImages = [
           <div class="flex items-center gap-2.5">
             <img 
               src="/images/logo-splash.png" 
-              alt="Sillerico & Abogados" 
+              alt="Sillerico & Asociados" 
               class="h-8 w-8 object-contain"
             />
-            <span class="font-['Cinzel',serif] text-base font-bold tracking-wider text-[#c5a059]">SILLERICO & ABOGADOS</span>
+            <span class="font-['Cinzel',serif] text-base font-bold tracking-wider text-[#c5a059]">SILLERICO & ASOCIADOS</span>
           </div>
           
           <p class="text-neutral-400 font-light leading-relaxed">
@@ -1515,7 +1570,7 @@ const galleryImages = [
       </div>
 
       <div class="max-w-7xl mx-auto px-4 md:px-8 pt-8 border-t border-neutral-800 text-center text-neutral-500 text-[10px] md:text-xs flex flex-col sm:flex-row justify-between items-center gap-4">
-        <span>© 2026 Sillerico & Abogados. Todos los derechos reservados.</span>
+        <span>© 2026 Sillerico & Asociados. Todos los derechos reservados.</span>
         <span>Diseñado con Excelencia y Rigor Académico Jurídico.</span>
       </div>
     </footer>
@@ -1606,7 +1661,7 @@ const galleryImages = [
           <div class="relative max-h-[70vh] max-w-[85vw] sm:max-w-md rounded-2xl bg-[#051f18]/90 border-2 border-[#c5a059]/50 shadow-[0_0_60px_rgba(197,160,89,0.45)] flex items-center justify-center p-3 backdrop-blur-md overflow-hidden">
             <img 
               src="/images/logo-main.jpg" 
-              alt="Sillerico & Abogados Logo Principal" 
+              alt="Sillerico & Asociados Logo Principal" 
               class="max-h-[55vh] sm:max-h-[60vh] w-auto object-contain rounded-xl filter drop-shadow-[0_6px_20px_rgba(0,0,0,0.7)]"
             />
           </div>
