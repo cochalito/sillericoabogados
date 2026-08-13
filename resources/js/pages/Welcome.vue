@@ -422,38 +422,38 @@ watch([searchKeyword, selectedCategory], () => {
 const partners = [
   {
     name: 'Dr. Alan Sillerico Segurondo',
-    role: 'Socio Fundador y Director General',
+    role: 'Abogado Asociado',
     credentials: 'Abogado y académico con más de 25 años de trayectoria profesional. Especialista en litigio complejo, estrategia corporativa y dirección general de casos de alto perfil.',
     image: '/images/avatar_alan.png',
-    type: 'Socio Fundador'
+    type: 'Abogado Asociado'
   },
   {
     name: 'Dra. Anghela Soliz de Sillerico',
     role: 'Socia y Subdirectora',
-    credentials: 'Especialista en derecho de familia, sucesiones y gestión organizacional. Coordina la práctica legal del bufete asegurando los más altos estándares de calidad y ética profesional.',
+    credentials: 'Licenciada en derecho de la Universidad de Aquino Bolivia UDABOL. Experta en derecho penal y derecho de familia. Cuenta con diplomados en educación superior, derecho penal y procesal penal, derecho constitucional y procesal constitucional, y derecho penal y litigación.',
     image: '/images/avatar_anghela.jpeg',
     type: 'Socia Subdirectora'
   },
   {
     name: 'Dr. Mauricio Mercado Foronda',
-    role: 'Abogado Asociado - Jefe del Área Civil',
-    credentials: 'Experto en derecho civil, contratos, obligaciones y derechos reales. Cuenta con amplia trayectoria en litigios patrimoniales y defensa de derechos de propiedad a nivel nacional.',
+    role: 'Abogado Asociado',
+    credentials: 'Abogado con amplia trayectoria en derecho civil y procesal civil, egresado de la Maestría en Derecho Civil y Procesal Civil de la Universidad Andina Simón Bolívar. Cuenta con sólida experiencia en litigios civiles, penales, laborales, familiares y administrativos, así como en asesoría legal corporativa y bancaria.',
     image: '/images/avatar_mauricio.jpeg',
-    type: 'Abogado Jefe'
+    type: 'Abogado Asociado'
   },
   {
     name: 'Dr. Álvaro Arias Antequera',
-    role: 'Abogado Asociado - Jefe del Área Comercial',
+    role: 'Abogado Asociado',
     credentials: 'Especialista en derecho societario, fusiones, adquisiciones y estructuración comercial. Asesora a empresas nacionales y extranjeras en transacciones corporativas y societarias.',
     image: '/images/avatar_alvaro.jpeg',
-    type: 'Abogado Jefe'
+    type: 'Abogado Asociado'
   },
   {
     name: 'Dr. Bismarck Molina',
-    role: 'Abogado Asociado - Jefe del Área Penal',
+    role: 'Abogado Asociado',
     credentials: 'Especialista en derecho penal, defensa litigante y criminal compliance. Cuenta con una destacada experiencia en litigio penal estratégico y representación en tribunales nacionales.',
     image: '/images/avatar_bismarck.png',
-    type: 'Abogado Jefe'
+    type: 'Abogado Asociado'
   },
   {
     name: 'Dr. Eduardo Yupanqui Quispe',
@@ -464,17 +464,17 @@ const partners = [
   },
   {
     name: 'Dra. Amalia Paucara Mamani',
-    role: 'Abogada Junior',
+    role: 'Abogada Asociada',
     credentials: 'Apoyo legal estratégico en derecho civil e investigación procesal. Destaca por su rigurosidad académica, dinamismo y compromiso con el patrocinio ético de la firma.',
     image: '/images/avatar_amalia.png',
-    type: 'Abogada Junior'
+    type: 'Abogada Asociada'
   },
   {
     name: 'Dra. Massiel Rullier Loza',
-    role: 'Abogada Junior',
-    credentials: 'Asistencia legal especializada en derecho comercial y corporativo. Encargada del seguimiento estratégico de procesos ante entes reguladores e investigación de jurisprudencia.',
+    role: 'Abogada',
+    credentials: 'Asistencia legal especializada en derecho penal y procesal. Encargada del seguimiento estratégico de procesos ante entes reguladores e investigación de jurisprudencia.',
     image: '/images/avatar_massiel.jpeg',
-    type: 'Abogada Junior'
+    type: 'Abogada'
   }
 ];
 
@@ -1196,18 +1196,33 @@ const galleryImages = [
           <div class="space-y-3">
             <span class="text-xs font-bold uppercase tracking-widest text-[#c5a059]">Trayectoria y Liderazgo</span>
             <h2 class="font-['Cinzel',serif] text-3xl md:text-4xl font-bold text-neutral-100 dark:text-white">
-              Sobre Sillerico & Asociados
+              Nuestra Historia
             </h2>
             <div class="w-16 h-[2px] bg-[#c5a059]"></div>
           </div>
 
-          <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-300 leading-relaxed font-light">
-            Fundada hace más de dos décadas en la ciudad de La Paz, nuestra firma ha sabido consolidarse como un referente de liderazgo e idoneidad jurídica. Ofrecemos a nuestros clientes nacionales y extranjeros un servicio que combina la solidez del derecho clásico con respuestas ágiles a los desafíos de la economía digital y la globalización de negocios.
-          </p>
+          <!-- Recuadro contenedor de Nuestra Historia con scroll personalizado -->
+          <div class="max-h-[300px] overflow-y-auto pr-3 space-y-4 text-xs sm:text-sm md:text-base text-neutral-300 dark:text-neutral-300 leading-relaxed font-light text-justify bg-[#0b3629]/40 border border-[#c5a059]/20 rounded-xl p-4 sm:p-5 shadow-inner custom-gold-scrollbar">
+            <p>
+              <strong class="text-[#c5a059] font-semibold">SILLERICO & ASOCIADOS – FIRMA DE ABOGADOS</strong> es el resultado de más de dieciséis años de experiencia profesional, dedicación y compromiso con la defensa de los derechos e intereses de personas, empresas e instituciones.
+            </p>
 
-          <p class="text-sm md:text-base text-neutral-300 dark:text-neutral-300 leading-relaxed font-light">
-            Nuestro compromiso es siempre velar por sus intereses patrimoniales mediante soluciones preventivas estratégicas y, de ser necesario, una representación litigante de primer nivel ante todas las instancias judiciales y arbitrales.
-          </p>
+            <p>
+              Nuestra historia comienza con el ejercicio independiente del Derecho por parte de nuestro Director General, Alan Sillerico Segurondo, quien inició su trayectoria profesional con una marcada orientación hacia el Derecho Penal, área en la que consolidó una amplia experiencia en la defensa técnica, la litigación oral y la asesoría jurídica especializada.
+            </p>
+
+            <p>
+              A lo largo de los años, el ejercicio constante de la profesión, la formación académica permanente y la confianza depositada por nuestros clientes permitieron ampliar progresivamente el ámbito de actuación profesional. Lo que inició como una práctica especializada en materia penal evolucionó hacia una atención jurídica integral, incorporando servicios en Derecho Constitucional, Civil, Comercial, Laboral, Administrativo, Tributario, Familiar y otras áreas del ordenamiento jurídico boliviano.
+            </p>
+
+            <p>
+              Esta evolución respondió a una convicción clara: ofrecer a cada cliente soluciones jurídicas completas, estratégicas y de alta calidad, manteniendo siempre los principios de ética, responsabilidad, confidencialidad y excelencia profesional.
+            </p>
+
+            <p>
+              Como consecuencia natural de ese crecimiento nació <strong class="text-[#c5a059] font-semibold">SILLERICO & ASOCIADOS – FIRMA DE ABOGADOS</strong>, concebida como una organización jurídica moderna que integra experiencia, especialización y trabajo en equipo. La firma reúne profesionales comprometidos con la prestación de servicios legales de excelencia, orientados tanto a la prevención como a la solución eficaz de conflictos jurídicos.
+            </p>
+          </div>
 
           <!-- Tabbed Misión, Visión, Principios System -->
           <div class="mt-6 bg-[#0b3629]/60 border border-[#c5a059]/25 rounded-2xl p-6 space-y-5 shadow-xl backdrop-blur-sm">
@@ -1740,6 +1755,29 @@ html:not(.splash-pending) .animate-on-reveal {
 }
 .delay-600 {
   transition-delay: 600ms;
+}
+
+/* Custom Gold & Emerald Scrollbar */
+.custom-gold-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-gold-scrollbar::-webkit-scrollbar-track {
+  background: rgba(5, 31, 24, 0.6);
+  border-radius: 9999px;
+}
+.custom-gold-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(197, 160, 89, 0.45);
+  border-radius: 9999px;
+  border: 1px solid rgba(197, 160, 89, 0.25);
+}
+.custom-gold-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 180, 108, 0.85);
+  box-shadow: 0 0 8px rgba(197, 160, 89, 0.6);
+}
+/* Firefox support */
+.custom-gold-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(197, 160, 89, 0.45) rgba(5, 31, 24, 0.6);
 }
 
 /* If the user has prefers-reduced-motion, disable the movement but keep the fade */
