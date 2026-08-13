@@ -19,6 +19,9 @@ jobs:
           php-version: '8.4'
           coverage: none
 
+      - name: 🎼 Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
