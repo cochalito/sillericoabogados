@@ -527,7 +527,12 @@ const galleryImages = [
 </script>
 
 <template>
-  <Head title="Sillerico & Asociados - Firma de Abogados">
+  <Head title="Sillerico & Asociados - Firma de Abogados en Bolivia">
+    <meta name="description" content="Sillerico & Asociados es una firma jurídica líder en Bolivia especializada en Derecho Comercial, Corporativo, Penal, Civil, Laboral, Tributario y Constitucional." />
+    <meta name="keywords" content="abogados Bolivia, firma de abogados La Paz, derecho penal, derecho civil, litigios corporativos, Sillerico y Asociados" />
+    <meta property="og:title" content="Sillerico & Asociados - Firma de Abogados" />
+    <meta property="og:description" content="Asesoría jurídica integral, defensa litigante y visión preventiva en Bolivia." />
+    <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -546,6 +551,10 @@ const galleryImages = [
             src="/images/logo-splash.png" 
             alt="Sillerico & Asociados" 
             class="h-32 w-32 md:h-40 md:w-40 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] relative -mt-3 -mb-12 md:-mt-5 md:-mb-16"
+            width="160"
+            height="160"
+            fetchpriority="high"
+            decoding="async"
           />
         </a>
 
@@ -684,6 +693,10 @@ const galleryImages = [
               src="/images/logo-main.jpg" 
               alt="Sillerico & Asociados - Emblema Principal" 
               class="w-full h-auto max-h-[380px] sm:max-h-[470px] md:max-h-[560px] lg:max-h-[630px] object-cover object-center filter brightness-110 contrast-110 [mask-image:radial-gradient(ellipse_70%_65%_at_50%_50%,black_25%,transparent_82%)] [-webkit-mask-image:radial-gradient(ellipse_70%_65%_at_50%_50%,black_25%,transparent_82%)] scale-115"
+              width="1600"
+              height="1600"
+              fetchpriority="high"
+              decoding="async"
             />
           </div>
 
@@ -1047,6 +1060,10 @@ const galleryImages = [
                 :src="partner.image" 
                 :alt="partner.name"
                 class="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-500" 
+                width="400"
+                height="400"
+                loading="lazy"
+                decoding="async"
               />
               <div 
                 v-else
@@ -1131,6 +1148,10 @@ const galleryImages = [
                 :src="img.src" 
                 :alt="img.title"
                 class="w-full h-full object-cover" 
+                width="1400"
+                height="900"
+                loading="lazy"
+                decoding="async"
               />
               
               <!-- Gradient Overlay (Bottom text overlay) -->
@@ -1508,6 +1529,10 @@ const galleryImages = [
               src="/images/logo-splash.png" 
               alt="Sillerico & Asociados" 
               class="h-8 w-8 object-contain"
+              width="32"
+              height="32"
+              loading="lazy"
+              decoding="async"
             />
             <span class="font-['Cinzel',serif] text-base font-bold tracking-wider text-[#c5a059]">SILLERICO & ASOCIADOS</span>
           </div>
@@ -1688,6 +1713,10 @@ const galleryImages = [
               src="/images/logo-main.jpg" 
               alt="Sillerico & Asociados Logo Principal" 
               class="max-h-[55vh] sm:max-h-[60vh] w-auto object-contain rounded-xl filter drop-shadow-[0_6px_20px_rgba(0,0,0,0.7)]"
+              width="800"
+              height="800"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
