@@ -39,8 +39,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          security: ftps
-          security-options: '{"rejectUnauthorized": false}'
+          security: loose
           server-dir: /web_laravel/
           exclude: |
             **/.git*
@@ -55,7 +54,6 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          security: ftps
-          security-options: '{"rejectUnauthorized": false}'
+          security: loose
           local-dir: ./public/
           server-dir: /public_html/
