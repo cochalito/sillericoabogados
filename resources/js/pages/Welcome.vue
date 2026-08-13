@@ -260,10 +260,12 @@ const menuItems = [
 const contactLinks = {
   whatsapp: 'https://wa.me/59177234317', // WhatsApp direct link
   facebook: 'https://www.facebook.com/share/18kruBp6GV/?mibextid=wwXIfr',
-  phones: ['+591 77234317', '+591 2 2443020'],
+  phones: ['2900080', '2900370'],
+  fax: '2900370',
+  whatsappNumber: '+591 77234317',
   emails: ['contacto@sillericoasociados.com', 'info@sillericoasociados.com'],
-  address: 'Av. Mariscal Santa Cruz, Edificio Hansa, Piso 12, La Paz, Bolivia',
-  locationUrl: 'https://maps.google.com/?q=Edificio+Hansa+La+Paz'
+  address: 'Edificio Park Inn, Piso 6, Of. 66, Calle Federico Suazo y Bueno, No. 1598 de la ciudad de La Paz - Bolivia.',
+  locationUrl: 'https://maps.google.com/?q=Edificio+Park+Inn+La+Paz'
 };
 
 const featuredService = {
@@ -1475,7 +1477,7 @@ const galleryImages = [
                 <div class="space-y-1">
                   <span class="text-[10px] uppercase font-bold tracking-widest text-amber-200/50 block">Dirección Principal</span>
                   <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed font-light">
-                    Av. Mariscal Santa Cruz, Edificio Hansa, Piso 12, La Paz, Bolivia.
+                    Edificio Park Inn, Piso 6, Of. 66, Calle Federico Suazo y Bueno, No. 1598 de la ciudad de La Paz - Bolivia.
                   </p>
                 </div>
               </div>
@@ -1486,9 +1488,22 @@ const galleryImages = [
                 </div>
                 <div class="space-y-1">
                   <span class="text-[10px] uppercase font-bold tracking-widest text-amber-200/50 block">Teléfonos de Contacto</span>
-                  <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed font-light">
-                    +591 77234317 / +591 2 2443020
-                  </p>
+                  <div class="text-xs sm:text-sm text-neutral-200 leading-relaxed font-light space-y-1">
+                    <p><strong class="font-medium text-amber-100">Teléfono:</strong> 2900080 &ndash; 2900370</p>
+                    <p><strong class="font-medium text-amber-100">Fax:</strong> 2900370</p>
+                    <p class="flex items-center gap-1.5 pt-0.5">
+                      <strong class="font-medium text-amber-100">WhatsApp:</strong>
+                      <a 
+                        :href="`${contactLinks.whatsapp}?text=${encodeURIComponent('Hola, quisiera realizar una consulta.')}`" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="text-emerald-400 hover:text-emerald-300 transition-colors font-medium underline underline-offset-2"
+                        title="Abrir chat de WhatsApp"
+                      >
+                        +591 77234317
+                      </a>
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1511,7 +1526,7 @@ const galleryImages = [
           <!-- Google Map Iframe (Interactive map) -->
           <div class="mt-8 overflow-hidden rounded-xl border border-[#c5a059]/30 shadow-lg">
             <iframe 
-              src="https://maps.google.com/maps?q=-16.4973762,-68.1359219(Edificio%20Hansa)&amp;t=&amp;z=17&amp;ie=UTF8&amp;iwloc=&amp;output=embed" 
+              src="https://maps.google.com/maps?q=Edificio%20Park%20Inn%20La%20Paz&amp;t=&amp;z=17&amp;ie=UTF8&amp;iwloc=&amp;output=embed" 
               class="w-full h-48 sm:h-56 md:h-64 border-0" 
               allowfullscreen="" 
               loading="lazy" 
@@ -1594,9 +1609,21 @@ const galleryImages = [
 
             <div class="flex items-start gap-3">
               <Phone class="w-4 h-4 text-[#c5a059] mt-0.5 shrink-0" />
-              <div class="flex flex-col text-neutral-400 font-light">
+              <div class="flex flex-col text-neutral-400 font-light space-y-0.5">
                 <span class="font-semibold text-neutral-300">Teléfonos de Atención:</span>
-                <span v-for="phone in contactLinks.phones" :key="phone">{{ phone }}</span>
+                <span><strong class="text-neutral-300 font-medium">Teléfono:</strong> 2900080 - 2900370</span>
+                <span><strong class="text-neutral-300 font-medium">Fax:</strong> 2900370</span>
+                <span>
+                  <strong class="text-neutral-300 font-medium">WhatsApp:</strong> 
+                  <a 
+                    :href="`${contactLinks.whatsapp}?text=${encodeURIComponent('Hola, quisiera realizar una consulta.')}`" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 ml-1"
+                  >
+                    +591 77234317
+                  </a>
+                </span>
               </div>
             </div>
 
