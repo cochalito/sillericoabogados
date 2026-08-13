@@ -25,9 +25,13 @@ const clearTimers = () => {
 };
 
 const updateDestinationCoordinates = () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+return;
+}
+
     const headerLogo = document.getElementById('header-logo-box');
     const splashLogo = document.querySelector('.splash-logo');
+
     if (headerLogo && splashLogo) {
         const headerRect = headerLogo.getBoundingClientRect();
         const splashRect = splashLogo.getBoundingClientRect();

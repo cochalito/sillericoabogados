@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { 
-  Sun, Moon, Monitor, Phone, MessageSquare, MapPin, 
+  Monitor, Phone, MessageSquare, MapPin, 
   ChevronRight, Search, FileText, Scale, Users, Image as ImageIcon, 
-  Info, ExternalLink, Mail, Check, Star, ArrowUpRight,
+  Info, ExternalLink, Mail,
   Facebook, Youtube, Twitter, Menu, X
 } from 'lucide-vue-next';
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import SplashScreen from '@/components/SplashScreen.vue';
-import { useAppearance } from '@/composables/useAppearance';
-
-
-// Use standard Laravel appearance manager
-const { appearance, updateAppearance, resolvedAppearance } = useAppearance();
 
 // Splash intro: show only on first visit per session
 const showSplash = ref(false);
@@ -56,6 +51,7 @@ let galleryInterval: any = null;
 
 const startAutoplay = () => {
   stopAutoplay();
+
   if (typeof window !== 'undefined') {
     galleryInterval = setInterval(() => {
       activeImageIndex.value = (activeImageIndex.value + 1) % galleryImages.length;
@@ -131,11 +127,16 @@ const currentSectionHref = ref('#servicios');
 const isMobileMenuOpen = ref(false);
 
 const navigateToSection = (targetHref: string, label?: string, forceDirection?: 'l2r' | 'r2l') => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {
+return;
+}
 
   const targetId = targetHref.replace('#', '');
   const targetEl = document.getElementById(targetId);
-  if (!targetEl) return;
+
+  if (!targetEl) {
+return;
+}
 
   isMobileMenuOpen.value = false;
 
@@ -325,6 +326,7 @@ const services = [
 
 const getServiceWhatsappUrl = (serviceTitle: string) => {
   const message = `Estoy interesado en su servicio de ${serviceTitle}`;
+
   return `${contactLinks.whatsapp}?text=${encodeURIComponent(message)}`;
 };
 
@@ -400,6 +402,7 @@ const filteredPublications = computed(() => {
     if (selectedCategory.value === 'todos') {
       return matchesKeyword;
     }
+
     return pub.category === selectedCategory.value && matchesKeyword;
   });
 });
@@ -407,6 +410,7 @@ const filteredPublications = computed(() => {
 const paginatedPublications = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
+
   return filteredPublications.value.slice(start, end);
 });
 
@@ -494,6 +498,7 @@ const visiblePartners = computed(() => {
 
 const getPartnerWhatsappUrl = (partnerName: string) => {
   const message = `Hola, quisiera agendar una consulta con ${partnerName}`;
+
   return `${contactLinks.whatsapp}?text=${encodeURIComponent(message)}`;
 };
 
