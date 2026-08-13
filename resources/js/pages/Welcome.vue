@@ -258,7 +258,7 @@ const menuItems = [
 
 const contactLinks = {
   whatsapp: 'https://wa.me/59177234317', // WhatsApp direct link
-  facebook: 'https://facebook.com/sillericoasociados',
+  facebook: 'https://www.facebook.com/share/18kruBp6GV/?mibextid=wwXIfr',
   phones: ['+591 77234317', '+591 2 2443020'],
   emails: ['contacto@sillericoasociados.com', 'info@sillericoasociados.com'],
   address: 'Av. Mariscal Santa Cruz, Edificio Hansa, Piso 12, La Paz, Bolivia',
