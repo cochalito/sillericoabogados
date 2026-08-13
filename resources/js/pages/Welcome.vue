@@ -431,21 +431,21 @@ const partners = [
     name: 'Dra. Anghela Soliz de Sillerico',
     role: 'Socia y Subdirectora',
     credentials: 'Especialista en derecho de familia, sucesiones y gestión organizacional. Coordina la práctica legal del bufete asegurando los más altos estándares de calidad y ética profesional.',
-    image: '/images/avatar_anghela.png',
+    image: '/images/avatar_anghela.jpeg',
     type: 'Socia Subdirectora'
   },
   {
     name: 'Dr. Mauricio Mercado Foronda',
     role: 'Abogado Asociado - Jefe del Área Civil',
     credentials: 'Experto en derecho civil, contratos, obligaciones y derechos reales. Cuenta con amplia trayectoria en litigios patrimoniales y defensa de derechos de propiedad a nivel nacional.',
-    image: '/images/avatar_mauricio.png',
+    image: '/images/avatar_mauricio.jpeg',
     type: 'Abogado Jefe'
   },
   {
     name: 'Dr. Álvaro Arias Antequera',
     role: 'Abogado Asociado - Jefe del Área Comercial',
     credentials: 'Especialista en derecho societario, fusiones, adquisiciones y estructuración comercial. Asesora a empresas nacionales y extranjeras en transacciones corporativas y societarias.',
-    image: '/images/avatar_alvaro.png',
+    image: '/images/avatar_alvaro.jpeg',
     type: 'Abogado Jefe'
   },
   {
@@ -459,7 +459,7 @@ const partners = [
     name: 'Dr. Eduardo Yupanqui Quispe',
     role: 'Abogado Asociado',
     credentials: 'Especializado en derecho laboral, seguridad social y patrocinio en materia de trabajo. Dedicado a la resolución preventiva de conflictos y defensa patronal corporativa.',
-    image: '/images/avatar_eduardo.png',
+    image: '/images/avatar_eduardo.jpeg',
     type: 'Abogado Asociado'
   },
   {
@@ -473,13 +473,23 @@ const partners = [
     name: 'Dra. Massiel Rullier Loza',
     role: 'Abogada Junior',
     credentials: 'Asistencia legal especializada en derecho comercial y corporativo. Encargada del seguimiento estratégico de procesos ante entes reguladores e investigación de jurisprudencia.',
-    image: '/images/avatar_massiel.png',
+    image: '/images/avatar_massiel.jpeg',
     type: 'Abogada Junior'
   }
 ];
 
+const visiblePartnersOrder = [
+  'Dra. Anghela Soliz de Sillerico',
+  'Dr. Mauricio Mercado Foronda',
+  'Dr. Eduardo Yupanqui Quispe',
+  'Dr. Álvaro Arias Antequera',
+  'Dra. Massiel Rullier Loza'
+];
+
 const visiblePartners = computed(() => {
-  return partners.filter(p => !p.name.includes('Alan Sillerico'));
+  return visiblePartnersOrder
+    .map(name => partners.find(p => p.name === name))
+    .filter((p): p is typeof partners[number] => Boolean(p));
 });
 
 const getPartnerWhatsappUrl = (partnerName: string) => {
