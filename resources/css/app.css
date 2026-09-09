@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+        
+    --color-brand-green: #082a20;
+    --color-brand-green-hover: #0c3d2f;
+    --color-brand-green-light: #e6ecea;
+    --color-brand-gold: #c5a059;
+    --color-brand-gold-hover: #b08c48;
+    --color-brand-gold-light: #faf5eb;
+}
+
+html {
+    font-size: 120%;
+}
