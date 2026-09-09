@@ -324,7 +324,7 @@
     </div>
 
     <!-- MAIN APP CONTAINER -->
-    <div class="flex flex-col h-screen min-h-screen transition-all duration-300"
+    <div class="flex flex-col h-screen overflow-hidden transition-all duration-300"
          :class="{
             'lg:pl-64': !desktopSidebarCollapsed,
             'lg:pl-20': desktopSidebarCollapsed
@@ -526,13 +526,6 @@
         <main class="flex-1 min-h-0 flex flex-col overflow-y-auto" style="padding: 10px !important;">
             @yield('content')
         </main>
-        
-        <!-- FOOTER -->
-        <footer class="py-2.5 px-6 border-t border-slate-200/50 bg-white text-center text-[11px] text-slate-400 flex flex-col sm:flex-row justify-between gap-2 shrink-0">
-            <span>&copy; {{ date('Y') }} Sillerico &amp; Abogados - Todos los derechos reservados.</span>
-            <span>Sistema Administrativo de Control de Procesos (v1.0 Mockup)</span>
-        </footer>
-
     </div>
 
     <!-- Initialize Lucide Icons -->

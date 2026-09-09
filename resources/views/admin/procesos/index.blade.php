@@ -4,9 +4,9 @@
 @section('header_title', 'Control de Procesos')
 
 @section('content')
-<div x-data="procesosData()" class="flex-1 flex flex-col min-h-0 h-full animate-fade-in">
+<div x-data="procesosData()" class="flex-1 min-h-0 flex flex-col w-full animate-fade-in overflow-hidden">
     <!-- Table and Filter Area -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs flex-1 flex flex-col min-h-0 h-full overflow-hidden">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs flex-1 min-h-0 flex flex-col w-full overflow-hidden">
         <!-- Advanced Filters & Action Header -->
         <div class="border-b border-slate-100 space-y-4 shrink-0" style="padding: 18px !important;">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
