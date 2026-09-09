@@ -45,6 +45,22 @@ class SujetoProcesal extends Model
         return $this->hasMany(Proceso::class, 'cliente_id');
     }
 
+    // Aliases
+    public function procesosCliente(): HasMany
+    {
+        return $this->procesosComoCliente();
+    }
+
+    public function procesosDemandante(): HasMany
+    {
+        return $this->procesosComoDemandante();
+    }
+
+    public function procesosDemandado(): HasMany
+    {
+        return $this->procesosComoDemandado();
+    }
+
     public function todosLosProcesos()
     {
         return Proceso::where('demandante_id', $this->id)
