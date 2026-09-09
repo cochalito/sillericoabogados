@@ -14,11 +14,11 @@ class DashboardController extends Controller
     public function index(): View
     {
         $totalProcesos = Proceso::count();
-        $casosPenales = Proceso::where('materia', 'Penal')->count();
-        $casosCiviles = Proceso::where('materia', 'Civil')->count();
-        $casosFamiliares = Proceso::where('materia', 'Familiar')->count();
-        $casosLaborales = Proceso::where('materia', 'Laboral')->count();
-        $casosCorporativos = Proceso::where('materia', 'Corporativo')->count();
+        $casosPenales = Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Penal%'))->count();
+        $casosCiviles = Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Civil%'))->count();
+        $casosFamiliares = Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Familiar%'))->count();
+        $casosLaborales = Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Laboral%'))->count();
+        $casosCorporativos = Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Comercial%')->orWhere('nombre', 'like', '%Corporativo%'))->count();
 
         $totalClientes = Cliente::count();
 
@@ -81,10 +81,10 @@ class DashboardController extends Controller
             });
 
         // Status counts
-        $casacion = Proceso::where('estado', 'Casación')->count();
-        $apelacion = Proceso::where('estado', 'Apelación')->count();
-        $sentencia = Proceso::where('estado', 'Sentencia')->count();
-        $rebeldia = Proceso::where('estado', 'Rebeldía')->count();
+        $casacion = Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Casación%'))->count();
+        $apelacion = Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Apelación%'))->count();
+        $sentencia = Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Sentencia%'))->count();
+        $rebeldia = Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Rebeldía%'))->count();
 
         return view('admin.dashboard', compact(
             'totalProcesos',

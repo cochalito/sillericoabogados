@@ -42,3 +42,9 @@ Route::match(['get', 'post'], '/switch-user/{id}', [UsuarioController::class, 's
 
 // 7. Registro de Actividades / Auditoría
 Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
+
+// 8. Enlaces del Nuevo Menú Multinivel (Navegación)
+Route::get('/documentos', fn() => view('admin.placeholder', ['modulo' => 'Documentos']))->name('documentos.index');
+Route::get('/parametros', fn() => view('admin.placeholder', ['modulo' => 'Parámetros del Sistema']))->name('parametros.index');
+Route::get('/articulos', fn() => view('admin.placeholder', ['modulo' => 'Artículos y Leyes']))->name('articulos.index');
+Route::get('/roles', fn() => view('admin.placeholder', ['modulo' => 'Roles y Permisos (RBAC)']))->name('roles.index');

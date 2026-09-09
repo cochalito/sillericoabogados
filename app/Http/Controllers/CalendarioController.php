@@ -17,7 +17,7 @@ class CalendarioController extends Controller
             ->orderBy('fecha_hora_inicio', 'asc')
             ->get();
 
-        $procesos = Proceso::select('id', 'codigo_interno', 'demandante_denunciante', 'delito_accion')->get();
+        $procesos = Proceso::with(['demandante', 'articuloPrincipal'])->get();
         $abogados = User::where('es_abogado', true)->get();
 
         return view('admin.calendario.index', compact('eventos', 'procesos', 'abogados'));

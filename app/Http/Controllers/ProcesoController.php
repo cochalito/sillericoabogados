@@ -31,11 +31,11 @@ class ProcesoController extends Controller
         }
 
         if ($request->filled('materia') && $request->materia !== 'Todas') {
-            $query->where('materia', $request->materia);
+            $query->whereHas('materia', fn($q) => $q->where('nombre', $request->materia));
         }
 
         if ($request->filled('estado') && $request->estado !== 'Todos') {
-            $query->where('estado', $request->estado);
+            $query->whereHas('estado', fn($q) => $q->where('nombre', $request->estado));
         }
 
         if ($request->filled('abogado') && $request->abogado !== 'Todos') {
@@ -104,15 +104,15 @@ class ProcesoController extends Controller
         // Stats
         $stats = [
             'total' => Proceso::count(),
-            'penal' => Proceso::where('materia', 'Penal')->count(),
-            'civil' => Proceso::where('materia', 'Civil')->count(),
-            'familiar' => Proceso::where('materia', 'Familiar')->count(),
-            'laboral' => Proceso::where('materia', 'Laboral')->count(),
-            'corporativo' => Proceso::where('materia', 'Corporativo')->count(),
-            'casacion' => Proceso::where('estado', 'Casación')->count(),
-            'apelacion' => Proceso::where('estado', 'Apelación')->count(),
-            'sentencia' => Proceso::where('estado', 'Sentencia')->count(),
-            'rebeldia' => Proceso::where('estado', 'Rebeldía')->count(),
+            'penal' => Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Penal%'))->count(),
+            'civil' => Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Civil%'))->count(),
+            'familiar' => Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Familiar%'))->count(),
+            'laboral' => Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Laboral%'))->count(),
+            'corporativo' => Proceso::whereHas('materia', fn($q) => $q->where('nombre', 'like', '%Comercial%')->orWhere('nombre', 'like', '%Corporativo%'))->count(),
+            'casacion' => Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Casación%'))->count(),
+            'apelacion' => Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Apelación%'))->count(),
+            'sentencia' => Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Sentencia%'))->count(),
+            'rebeldia' => Proceso::whereHas('estado', fn($q) => $q->where('nombre', 'like', '%Rebeldía%'))->count(),
         ];
 
         $equipo = User::where('es_abogado', true)->get()->map(function ($u) {

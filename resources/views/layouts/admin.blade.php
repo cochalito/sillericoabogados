@@ -28,7 +28,24 @@
         }
     </style>
 </head>
-<body class="h-full font-sans antialiased text-slate-800" x-data="{ sidebarOpen: false, desktopSidebarCollapsed: false }">
+<body class="h-full font-sans antialiased text-slate-800" 
+      x-data="{ 
+          sidebarOpen: false, 
+          desktopSidebarCollapsed: false,
+          menus: {
+              procesos: {{ Request::is('procesos*', 'clientes*', 'documentos*', 'parametros*') ? 'true' : 'true' }},
+              herramientas: {{ Request::is('articulos*', 'calendario*', 'auditoria*') ? 'true' : 'false' }},
+              administracion: {{ Request::is('usuarios*', 'roles*') ? 'true' : 'false' }}
+          },
+          toggle(group) {
+              if (this.desktopSidebarCollapsed) {
+                  this.desktopSidebarCollapsed = false;
+                  this.menus[group] = true;
+              } else {
+                  this.menus[group] = !this.menus[group];
+              }
+          }
+      }">
 
     <!-- Mobile Sidebar Backdrop -->
     <div x-show="sidebarOpen" 
@@ -70,97 +87,208 @@
             </button>
         </div>
 
-        <!-- Sidebar Navigation -->
-        <div class="flex-1 overflow-y-auto py-6 px-4 space-y-7">
-            <!-- Menú Principal -->
+        <!-- Sidebar Navigation (Multinivel) -->
+        <div class="flex-1 overflow-y-auto py-5 px-3 space-y-3">
+            
+            <!-- 1. DASHBOARD -->
             <div>
-                <div class="px-2 mb-2 text-[10px] font-bold tracking-widest text-slate-400/80 uppercase transition-opacity duration-300"
-                     :class="{ 'opacity-0 h-0 overflow-hidden': desktopSidebarCollapsed }">
-                    Control de Procesos
-                </div>
-                <nav class="space-y-1">
-                    <!-- Dashboard -->
-                    <a href="{{ url('/') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('/') ? 'bg-brand-gold/10 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('/') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Dashboard</span>
-                    </a>
+                <a href="{{ url('/') }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('/') ? 'bg-brand-gold/15 text-brand-gold font-semibold shadow-sm' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('/') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                    <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Dashboard</span>
+                </a>
+            </div>
+
+            <!-- 2. CONTROL DE PROCESOS (Multinivel) -->
+            <div class="space-y-1">
+                <!-- Header / Toggle -->
+                <button type="button" 
+                        @click="toggle('procesos')"
+                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all group {{ Request::is('procesos*', 'clientes*', 'documentos*', 'parametros*') ? 'text-brand-gold bg-white/5' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <i data-lucide="folder-kanban" class="w-4 h-4 shrink-0 {{ Request::is('procesos*', 'clientes*', 'documentos*', 'parametros*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                        <span class="truncate transition-opacity duration-300 text-xs font-semibold uppercase tracking-wider" 
+                              :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">
+                            Control de Procesos
+                        </span>
+                    </div>
+                    <i data-lucide="chevron-down" 
+                       class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200"
+                       :class="{ 'rotate-180': menus.procesos, 'opacity-0 w-0 hidden': desktopSidebarCollapsed }"></i>
+                </button>
+
+                <!-- Submenu Items -->
+                <div x-show="menus.procesos" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-1"
+                     class="ml-4 pl-3 border-l-2 border-brand-gold/20 space-y-1 pt-1 pb-1"
+                     :class="{ 'hidden': desktopSidebarCollapsed }">
                     
                     <!-- Procesos -->
                     <a href="{{ url('/procesos') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('procesos*') ? 'bg-brand-gold/10 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-                        <i data-lucide="folder-kanban" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('procesos*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Procesos</span>
-                        <span x-show="!desktopSidebarCollapsed" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold">
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('procesos*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="file-text" class="w-4 h-4 shrink-0 {{ Request::is('procesos*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Procesos</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-gold/15 text-brand-gold">
                             {{ \App\Models\Proceso::count() }}
                         </span>
                     </a>
 
                     <!-- Clientes -->
                     <a href="{{ url('/clientes') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('clientes*') ? 'bg-brand-gold/10 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-                        <i data-lucide="users" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('clientes*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Clientes</span>
-                        <span x-show="!desktopSidebarCollapsed" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('clientes*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="users" class="w-4 h-4 shrink-0 {{ Request::is('clientes*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Clientes</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
                             {{ \App\Models\Cliente::count() }}
                         </span>
                     </a>
 
-                    <!-- Audiencias -->
+                    <!-- Documentos -->
+                    <a href="{{ url('/documentos') }}" 
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('documentos*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="files" class="w-4 h-4 shrink-0 {{ Request::is('documentos*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Documentos</span>
+                        </div>
+                    </a>
+
+                    <!-- Parametros -->
+                    <a href="{{ url('/parametros') }}" 
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('parametros*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 shrink-0 {{ Request::is('parametros*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Parámetros</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. HERRAMIENTAS (Multinivel) -->
+            <div class="space-y-1">
+                <!-- Header / Toggle -->
+                <button type="button" 
+                        @click="toggle('herramientas')"
+                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all group {{ Request::is('articulos*', 'calendario*', 'auditoria*') ? 'text-brand-gold bg-white/5' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <i data-lucide="wrench" class="w-4 h-4 shrink-0 {{ Request::is('articulos*', 'calendario*', 'auditoria*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                        <span class="truncate transition-opacity duration-300 text-xs font-semibold uppercase tracking-wider" 
+                              :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">
+                            Herramientas
+                        </span>
+                    </div>
+                    <i data-lucide="chevron-down" 
+                       class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200"
+                       :class="{ 'rotate-180': menus.herramientas, 'opacity-0 w-0 hidden': desktopSidebarCollapsed }"></i>
+                </button>
+
+                <!-- Submenu Items -->
+                <div x-show="menus.herramientas" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-1"
+                     class="ml-4 pl-3 border-l-2 border-brand-gold/20 space-y-1 pt-1 pb-1"
+                     :class="{ 'hidden': desktopSidebarCollapsed }">
+                    
+                    <!-- Articulos y Leyes -->
+                    <a href="{{ url('/articulos') }}" 
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('articulos*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="book-open" class="w-4 h-4 shrink-0 {{ Request::is('articulos*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Artículos y Leyes</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                            {{ \App\Models\ArticuloLey::count() }}
+                        </span>
+                    </a>
+
+                    <!-- Calendarios -->
                     <a href="{{ url('/calendario') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('calendario*') ? 'bg-brand-gold/10 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-                        <i data-lucide="calendar" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('calendario*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Audiencias &amp; Citas</span>
-                        <span x-show="!desktopSidebarCollapsed" class="ml-auto w-2 h-2 rounded-full bg-brand-gold"></span>
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('calendario*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="calendar" class="w-4 h-4 shrink-0 {{ Request::is('calendario*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Calendarios</span>
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-brand-gold"></span>
                     </a>
-                </nav>
-            </div>
 
-            <!-- Gestión y Documentos -->
-            <div>
-                <div class="px-2 mb-2 text-[10px] font-bold tracking-widest text-slate-400/80 uppercase transition-opacity duration-300"
-                     :class="{ 'opacity-0 h-0 overflow-hidden': desktopSidebarCollapsed }">
-                    Herramientas
-                </div>
-                <nav class="space-y-1">
-                    <!-- Auditoría & Trazabilidad -->
+                    <!-- Trasabilidad -->
                     <a href="{{ url('/auditoria') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('auditoria*') ? 'bg-brand-gold/10 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-                        <i data-lucide="history" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('auditoria*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Trazabilidad &amp; Logs</span>
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('auditoria*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="history" class="w-4 h-4 shrink-0 {{ Request::is('auditoria*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Trasabilidad</span>
+                        </div>
                     </a>
-
-                    <!-- Equipo Legal / Usuarios -->
-                    <a href="{{ url('/usuarios') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group {{ Request::is('usuarios*') ? 'bg-brand-gold/10 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-                        <i data-lucide="user-check" class="w-5 h-5 shrink-0 transition-colors {{ Request::is('usuarios*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Equipo Legal (6)</span>
-                    </a>
-                </nav>
-            </div>
-
-            <!-- Soporte & Sistema -->
-            <div>
-                <div class="px-2 mb-2 text-[10px] font-bold tracking-widest text-slate-400/80 uppercase transition-opacity duration-300"
-                     :class="{ 'opacity-0 h-0 overflow-hidden': desktopSidebarCollapsed }">
-                    Sistema
                 </div>
-                <nav class="space-y-1">
-                    <!-- Reportes -->
-                    <a href="#" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-all group">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5 shrink-0 text-slate-400 group-hover:text-white transition-colors"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Reportes</span>
+            </div>
+
+            <!-- 4. ADMINISTRACION (Multinivel) -->
+            <div class="space-y-1">
+                <!-- Header / Toggle -->
+                <button type="button" 
+                        @click="toggle('administracion')"
+                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all group {{ Request::is('usuarios*', 'roles*') ? 'text-brand-gold bg-white/5' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <i data-lucide="shield-check" class="w-4 h-4 shrink-0 {{ Request::is('usuarios*', 'roles*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                        <span class="truncate transition-opacity duration-300 text-xs font-semibold uppercase tracking-wider" 
+                              :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">
+                            Administración
+                        </span>
+                    </div>
+                    <i data-lucide="chevron-down" 
+                       class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200"
+                       :class="{ 'rotate-180': menus.administracion, 'opacity-0 w-0 hidden': desktopSidebarCollapsed }"></i>
+                </button>
+
+                <!-- Submenu Items -->
+                <div x-show="menus.administracion" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-1"
+                     class="ml-4 pl-3 border-l-2 border-brand-gold/20 space-y-1 pt-1 pb-1"
+                     :class="{ 'hidden': desktopSidebarCollapsed }">
+                    
+                    <!-- Equipo Legal -->
+                    <a href="{{ url('/usuarios') }}" 
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('usuarios*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="users-round" class="w-4 h-4 shrink-0 {{ Request::is('usuarios*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Equipo Legal</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                            {{ \App\Models\User::where('es_abogado', true)->count() }}
+                        </span>
                     </a>
 
-                    <!-- Configuración -->
-                    <a href="#" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-all group">
-                        <i data-lucide="settings" class="w-5 h-5 shrink-0 text-slate-400 group-hover:text-white transition-colors"></i>
-                        <span class="transition-opacity duration-300" :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">Configuración</span>
+                    <!-- Roles -->
+                    <a href="{{ url('/roles') }}" 
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('roles*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="key-round" class="w-4 h-4 shrink-0 {{ Request::is('roles*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Roles</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-gold/15 text-brand-gold">
+                            {{ \App\Models\Rol::count() }}
+                        </span>
                     </a>
-                </nav>
+                </div>
             </div>
+
         </div>
 
         @php
