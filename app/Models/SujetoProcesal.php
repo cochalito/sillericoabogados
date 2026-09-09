@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Cliente extends Model
+class SujetoProcesal extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -31,19 +30,25 @@ class Cliente extends Model
         'activo' => 'boolean',
     ];
 
-    protected static function booted(): void
+    public function procesosComoDemandante(): HasMany
     {
-        static::addGlobalScope('clientesOnly', function (Builder $builder) {
-            $builder->where('es_cliente', true);
-        });
-
-        static::creating(function ($cliente) {
-            $cliente->es_cliente = true;
-        });
+        return $this->hasMany(Proceso::class, 'demandante_id');
     }
 
-    public function procesos(): HasMany
+    public function procesosComoDemandado(): HasMany
+    {
+        return $this->hasMany(Proceso::class, 'demandado_id');
+    }
+
+    public function procesosComoCliente(): HasMany
     {
         return $this->hasMany(Proceso::class, 'cliente_id');
+    }
+
+    public function todosLosProcesos()
+    {
+        return Proceso::where('demandante_id', $this->id)
+            ->orWhere('demandado_id', $this->id)
+            ->orWhere('cliente_id', $this->id);
     }
 }

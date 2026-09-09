@@ -16,10 +16,9 @@ return new class extends Migration
             $table->string('titulo_actuacion', 255);
             $table->string('tipo_actuacion', 50)->default('Diligencia');
             $table->text('descripcion')->nullable();
-            $table->boolean('es_hito_relevante')->default(false);
+            $table->boolean('es_hito_relevante')->default(true);
             $table->timestamps();
-
-            $table->index(['proceso_id', 'fecha_hora']);
+            $table->softDeletes();
         });
     }
 

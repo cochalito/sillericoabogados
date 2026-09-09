@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -22,20 +23,20 @@ class Proceso extends Model
         'ianus',
         'codigo_caso',
         'portal_fiscalia',
-        'jurisdiccion',
-        'materia',
+        'materia_id',
+        'jurisdiccion_id',
+        'demandante_id',
+        'demandado_id',
         'cliente_id',
-        'rol_cliente',
-        'demandante_denunciante',
-        'demandado_denunciado',
-        'juzgado_tribunal',
-        'sala',
-        'autoridad_juez_fiscal',
-        'investigador_asignado',
-        'delito_accion',
-        'etapa_procesal',
-        'estado',
-        'estado_detalle',
+        'rol_cliente_id',
+        'articulo_principal_id',
+        'juez_id',
+        'juzgado_id',
+        'sala_id',
+        'investigador_id',
+        'etapa_procesal_id',
+        'estado_id',
+        'situacion_actual',
         'abogado_id',
         'fecha_inicio',
     ];
@@ -45,15 +46,90 @@ class Proceso extends Model
         'fecha_inicio' => 'date',
     ];
 
+    // ==========================================
+    // RELACIONES PARAMÉTRICAS
+    // ==========================================
+
+    public function materia(): BelongsTo
+    {
+        return $this->belongsTo(Materia::class, 'materia_id');
+    }
+
+    public function jurisdiccion(): BelongsTo
+    {
+        return $this->belongsTo(Jurisdiccion::class, 'jurisdiccion_id');
+    }
+
+    public function demandante(): BelongsTo
+    {
+        return $this->belongsTo(SujetoProcesal::class, 'demandante_id');
+    }
+
+    public function demandado(): BelongsTo
+    {
+        return $this->belongsTo(SujetoProcesal::class, 'demandado_id');
+    }
+
     public function cliente(): BelongsTo
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
+        return $this->belongsTo(SujetoProcesal::class, 'cliente_id');
+    }
+
+    public function rolCliente(): BelongsTo
+    {
+        return $this->belongsTo(RolParte::class, 'rol_cliente_id');
+    }
+
+    public function articuloPrincipal(): BelongsTo
+    {
+        return $this->belongsTo(ArticuloLey::class, 'articulo_principal_id');
+    }
+
+    public function articulos(): BelongsToMany
+    {
+        return $this->belongsToMany(ArticuloLey::class, 'proceso_articulos', 'proceso_id', 'articulo_id')
+            ->withPivot('es_principal')
+            ->withTimestamps();
+    }
+
+    public function juez(): BelongsTo
+    {
+        return $this->belongsTo(Juez::class, 'juez_id');
+    }
+
+    public function juzgado(): BelongsTo
+    {
+        return $this->belongsTo(Juzgado::class, 'juzgado_id');
+    }
+
+    public function sala(): BelongsTo
+    {
+        return $this->belongsTo(Sala::class, 'sala_id');
+    }
+
+    public function investigador(): BelongsTo
+    {
+        return $this->belongsTo(Investigador::class, 'investigador_id');
+    }
+
+    public function etapaProcesal(): BelongsTo
+    {
+        return $this->belongsTo(EtapaProcesal::class, 'etapa_procesal_id');
+    }
+
+    public function estado(): BelongsTo
+    {
+        return $this->belongsTo(EstadoProceso::class, 'estado_id');
     }
 
     public function abogado(): BelongsTo
     {
         return $this->belongsTo(User::class, 'abogado_id');
     }
+
+    // ==========================================
+    // BITÁCORA Y DOCUMENTOS
+    // ==========================================
 
     public function actuaciones(): HasMany
     {
@@ -75,6 +151,34 @@ class Proceso extends Model
         return $this->hasMany(AuditoriaProceso::class, 'proceso_id')->orderBy('created_at', 'desc');
     }
 
+    // ==========================================
+    // ACCESSORS PARA COMPATIBILIDAD
+    // ==========================================
+
+    public function getDemandanteDenuncianteAttribute(): string
+    {
+        return $this->demandante ? $this->demandante->nombre_razon_social : 'Sin demandante';
+    }
+
+    public function getDemandadoDenunciadoAttribute(): string
+    {
+        return $this->demandado ? $this->demandado->nombre_razon_social : 'Sin demandado';
+    }
+
+    public function getDelitoAccionAttribute(): string
+    {
+        return $this->articuloPrincipal ? $this->articuloPrincipal->epigrafe_delito : 'Acción Procesal';
+    }
+
+    public function getEstadoBadgeAttribute(): string
+    {
+        return $this->estado ? $this->estado->nombre : 'En Trámite';
+    }
+
+    // ==========================================
+    // SCOPES DE BÚSQUEDA
+    // ==========================================
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         if (empty($term)) {
@@ -86,28 +190,16 @@ class Proceso extends Model
               ->orWhere('cud', 'like', "%{$term}%")
               ->orWhere('nurej', 'like', "%{$term}%")
               ->orWhere('codigo_caso', 'like', "%{$term}%")
-              ->orWhere('demandante_denunciante', 'like', "%{$term}%")
-              ->orWhere('demandado_denunciado', 'like', "%{$term}%")
-              ->orWhere('delito_accion', 'like', "%{$term}%")
-              ->orWhere('juzgado_tribunal', 'like', "%{$term}%");
+              ->orWhereHas('demandante', function ($sq) use ($term) {
+                  $sq->where('nombre_razon_social', 'like', "%{$term}%");
+              })
+              ->orWhereHas('demandado', function ($sq) use ($term) {
+                  $sq->where('nombre_razon_social', 'like', "%{$term}%");
+              })
+              ->orWhereHas('articuloPrincipal', function ($sq) use ($term) {
+                  $sq->where('epigrafe_delito', 'like', "%{$term}%")
+                     ->orWhere('numero_articulo', 'like', "%{$term}%");
+              });
         });
-    }
-
-    public function scopeMateria(Builder $query, ?string $materia): Builder
-    {
-        if (empty($materia) || $materia === 'Todas') {
-            return $query;
-        }
-
-        return $query->where('materia', $materia);
-    }
-
-    public function scopeEstado(Builder $query, ?string $estado): Builder
-    {
-        if (empty($estado) || $estado === 'Todos') {
-            return $query;
-        }
-
-        return $query->where('estado', $estado);
     }
 }

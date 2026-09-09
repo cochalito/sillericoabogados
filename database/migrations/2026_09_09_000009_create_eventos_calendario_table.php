@@ -11,20 +11,18 @@ return new class extends Migration
         Schema::create('eventos_calendario', function (Blueprint $table) {
             $table->id();
             $table->foreignId('proceso_id')->nullable()->constrained('procesos')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('titulo', 255);
-            $table->string('tipo_evento', 50)->default('Audiencia');
-            $table->dateTime('fecha_hora_inicio')->index();
+            $table->string('tipo_evento', 50)->default('Audiencia'); // Audiencia, Plazo Fatal, Reunión, Diligencia
+            $table->dateTime('fecha_hora_inicio');
             $table->dateTime('fecha_hora_fin')->nullable();
             $table->string('lugar_enlace', 255)->nullable();
             $table->boolean('es_plazo_fatal')->default(false);
-            $table->string('prioridad', 20)->default('Media');
-            $table->string('estado', 30)->default('Pendiente');
+            $table->string('prioridad', 20)->default('Media'); // Baja, Media, Alta, Urgente
+            $table->string('estado', 30)->default('Pendiente'); // Pendiente, Realizado, Suspendido, Reprogramado
             $table->text('observaciones')->nullable();
-            $table->boolean('notificado_telegram')->default(false);
             $table->timestamps();
-
-            $table->index(['fecha_hora_inicio', 'estado']);
+            $table->softDeletes();
         });
     }
 
