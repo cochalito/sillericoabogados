@@ -4,11 +4,11 @@
 @section('header_title', 'Control de Procesos')
 
 @section('content')
-<div x-data="procesosData()" class="space-y-6 animate-fade-in">
+<div x-data="procesosData()" class="flex-1 flex flex-col min-h-0 h-full animate-fade-in">
     <!-- Table and Filter Area -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs flex-1 flex flex-col min-h-0 h-full overflow-hidden">
         <!-- Advanced Filters & Action Header -->
-        <div class="p-[18px] border-b border-slate-100 space-y-4">
+        <div class="border-b border-slate-100 space-y-4 shrink-0" style="padding: 18px !important;">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <!-- Action Button in Header -->
                 <button @click="$dispatch('open-new-case-modal')" 
@@ -68,18 +68,18 @@
             </div>
         </div>
 
-        <!-- Table View -->
-        <div class="overflow-x-auto">
+        <!-- Table View with Scrollable Rows -->
+        <div class="flex-1 min-h-0 overflow-auto">
             <table class="w-full text-left border-collapse min-w-[1000px]">
-                <thead>
-                    <tr class="bg-slate-50/75 border-b border-slate-100 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-                        <th class="py-3.5 px-4 w-[18%]">Nro. de Caso / CUD / NUREJ</th>
-                        <th class="py-3.5 px-4 w-[13%]">Denunciante</th>
-                        <th class="py-3.5 px-4 w-[15%]">Denunciado</th>
-                        <th class="py-3.5 px-4 w-[20%]">Juzgado / Fiscalía</th>
-                        <th class="py-3.5 px-4 w-[12%]">Delito / Acción</th>
-                        <th class="py-3.5 px-4 w-[17%]">Estado del Proceso</th>
-                        <th class="py-3.5 px-4 w-[5%] text-center">Detalle</th>
+                <thead class="sticky top-0 z-10 bg-slate-50 shadow-2xs">
+                    <tr class="border-b border-slate-200 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                        <th class="py-3 px-4 w-[18%] bg-slate-50">Nro. de Caso / CUD / NUREJ</th>
+                        <th class="py-3 px-4 w-[13%] bg-slate-50">Denunciante</th>
+                        <th class="py-3 px-4 w-[15%] bg-slate-50">Denunciado</th>
+                        <th class="py-3 px-4 w-[20%] bg-slate-50">Juzgado / Fiscalía</th>
+                        <th class="py-3 px-4 w-[12%] bg-slate-50">Delito / Acción</th>
+                        <th class="py-3 px-4 w-[17%] bg-slate-50">Estado del Proceso</th>
+                        <th class="py-3 px-4 w-[5%] bg-slate-50 text-center">Detalle</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs text-slate-600">
@@ -152,7 +152,7 @@
         </div>
         
         <!-- Table Footer Pagination -->
-        <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div class="px-6 py-3 border-t border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 shrink-0">
             <div class="flex items-center gap-3">
                 <span x-text="paginationSummary"></span>
                 <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
