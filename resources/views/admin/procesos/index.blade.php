@@ -5,72 +5,65 @@
 
 @section('content')
 <div x-data="procesosData()" class="space-y-6 animate-fade-in">
-    <!-- Action Bar -->
-    <div class="flex items-center justify-end">
-        <button @click="$dispatch('open-new-case-modal')" 
-                class="flex items-center justify-center gap-2 px-4 py-2 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01]">
-            <i data-lucide="folder-plus" class="w-4 h-4"></i>
-            Registrar Nuevo Proceso
-        </button>
-    </div>
-
     <!-- Table and Filter Area -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
-        <!-- Advanced Filters -->
+        <!-- Advanced Filters & Action Header -->
         <div class="p-6 border-b border-slate-100 space-y-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h3 class="text-sm font-bold text-slate-800 tracking-tight">Listado Completo de Procesos Penales y Civiles</h3>
+                <!-- Action Button in Header -->
+                <button @click="$dispatch('open-new-case-modal')" 
+                        class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01] shrink-0">
+                    <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                    Registrar Nuevo Proceso
+                </button>
+
                 <!-- Tab Filters by Estado -->
                 <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-[10px] font-bold text-slate-500 overflow-x-auto">
-                    <button class="px-3.5 py-1.5 rounded-lg transition-all"
+                    <button class="px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap"
                             :class="selectedEstado === 'Todos' ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
                             @click="selectedEstado = 'Todos'">Todos</button>
-                    <button class="px-3.5 py-1.5 rounded-lg transition-all"
-                            :class="selectedEstado === 'Casación' ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
-                            @click="selectedEstado = 'Casación'">Casación</button>
-                    <button class="px-3.5 py-1.5 rounded-lg transition-all"
-                            :class="selectedEstado === 'Apelación' ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
-                            @click="selectedEstado = 'Apelación'">Apelaciones</button>
-                    <button class="px-3.5 py-1.5 rounded-lg transition-all"
-                            :class="selectedEstado === 'Sentencia' ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
-                            @click="selectedEstado = 'Sentencia'">Sentencias</button>
-                    <button class="px-3.5 py-1.5 rounded-lg transition-all"
-                            :class="selectedEstado === 'Rebeldía' ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
-                            @click="selectedEstado = 'Rebeldía'">Rebeldía</button>
+                    <template x-for="est in estadosList" :key="est.id">
+                        <button class="px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap"
+                                :class="selectedEstado === est.nombre ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
+                                @click="selectedEstado = est.nombre"
+                                x-text="est.nombre"></button>
+                    </template>
                 </div>
             </div>
 
-            <!-- Search, Materia, and Abogado filter row -->
+            <!-- Parametric Filters: Materia, Abogado, Search -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- 1. Materia Filter -->
+                <div>
+                    <select x-model="selectedMateria" 
+                            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 font-medium">
+                        <option value="Todas">Todas las materias</option>
+                        <template x-for="mat in materiasList" :key="mat.id">
+                            <option :value="mat.nombre" x-text="mat.nombre"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- 2. Abogado Filter -->
+                <div>
+                    <select x-model="selectedAbogado" 
+                            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 font-medium">
+                        <option value="Todos">Todos los abogados</option>
+                        <template x-for="m in equipo" :key="m.nombre">
+                            <option :value="m.nombre" x-text="m.nombre"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- 3. Search Query Input -->
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
                     </div>
                     <input type="text" 
                            x-model="searchQuery" 
-                           placeholder="Buscar por caso, CUD, sujeto o juzgado..." 
-                           class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-600">
-                </div>
-
-                <div>
-                    <select x-model="selectedMateria" 
-                            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-600 font-medium font-sans">
-                        <option value="Todas">Todas las materias</option>
-                        <option value="Penal">Derecho Penal</option>
-                        <option value="Laboral">Derecho Laboral</option>
-                        <option value="Familiar">Derecho de Familia</option>
-                        <option value="Civil">Derecho Civil</option>
-                    </select>
-                </div>
-
-                <div>
-                    <select x-model="selectedAbogado" 
-                            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-600 font-medium font-sans">
-                        <option value="Todos">Todos los abogados</option>
-                        <template x-for="m in equipo" :key="m.nombre">
-                            <option :value="m.nombre" x-text="m.nombre"></option>
-                        </template>
-                    </select>
+                           placeholder="Buscar por caso, CUD, NUREJ, partes, juzgado..." 
+                           class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700">
                 </div>
             </div>
         </div>
@@ -592,23 +585,22 @@
                             <label class="text-[10px] font-bold text-slate-400 uppercase">Materia</label>
                             <select x-model="newProceso.materia" required
                                     class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-600">
-                                <option value="Penal">Penal</option>
-                                <option value="Civil">Civil</option>
-                                <option value="Laboral">Laboral</option>
-                                <option value="Familiar">Familiar</option>
+                                <template x-for="mat in materiasList" :key="mat.id">
+                                    <option :value="mat.nombre" x-text="mat.nombre"></option>
+                                </template>
                             </select>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Denunciante</label>
-                            <input type="text" x-model="newProceso.denunciante" required placeholder="Denunciante"
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Denunciante / Cliente</label>
+                            <input type="text" x-model="newProceso.denunciante" required placeholder="Nombre del Denunciante / Cliente"
                                    class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Denunciado</label>
-                            <input type="text" x-model="newProceso.denunciado" required placeholder="Denunciado"
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Denunciado / Contraparte</label>
+                            <input type="text" x-model="newProceso.denunciado" required placeholder="Nombre del Denunciado"
                                    class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
                         </div>
                     </div>
@@ -650,11 +642,9 @@
                             <label class="text-[10px] font-bold text-slate-400 uppercase">Estado Inicial</label>
                             <select x-model="newProceso.estado_badge" required
                                     class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-600">
-                                <option value="Casación">Casación</option>
-                                <option value="Sentencia">Sentencia</option>
-                                <option value="Apelación">Apelación</option>
-                                <option value="Rebeldía">Rebeldía</option>
-                                <option value="Conciliación">Conciliación</option>
+                                <template x-for="est in estadosList" :key="est.id">
+                                    <option :value="est.nombre" x-text="est.nombre"></option>
+                                </template>
                             </select>
                         </div>
                     </div>
@@ -931,16 +921,23 @@
             },
             equipo: @json($equipo),
             casos: @json($procesosFormatted),
+            materiasList: @json($materias),
+            estadosList: @json($estados),
+            juzgadosList: @json($juzgados),
+            articulosList: @json($articulos),
+            jurisdiccionesList: @json($jurisdicciones),
 
             get filteredCasos() {
                 return this.casos.filter(caso => {
-                    const matchesSearch = !this.searchQuery || 
-                        (caso.codigo && caso.codigo.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-                        (caso.nurej && caso.nurej.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-                        (caso.denunciante && caso.denunciante.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-                        (caso.denunciado && caso.denunciado.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-                        (caso.delito && caso.delito.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-                        (caso.juzgado && caso.juzgado.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                    const q = this.searchQuery ? this.searchQuery.toLowerCase().trim() : '';
+                    const matchesSearch = !q || 
+                        (caso.codigo && String(caso.codigo).toLowerCase().includes(q)) ||
+                        (caso.nurej && String(caso.nurej).toLowerCase().includes(q)) ||
+                        (caso.cud && String(caso.cud).toLowerCase().includes(q)) ||
+                        (caso.denunciante && String(caso.denunciante).toLowerCase().includes(q)) ||
+                        (caso.denunciado && String(caso.denunciado).toLowerCase().includes(q)) ||
+                        (caso.delito && String(caso.delito).toLowerCase().includes(q)) ||
+                        (caso.juzgado && String(caso.juzgado).toLowerCase().includes(q));
 
                     const matchesMateria = this.selectedMateria === 'Todas' || caso.materia === this.selectedMateria;
                     const matchesEstado = this.selectedEstado === 'Todos' || caso.estado_badge === this.selectedEstado;
@@ -975,19 +972,26 @@
             
             async submitForm() {
                 try {
-                    const abgObj = this.equipo.find(e => e.nombre === this.newProceso.abogado);
+                    const matObj = this.materiasList ? this.materiasList.find(m => m.nombre === this.newProceso.materia) : null;
+                    const estObj = this.estadosList ? this.estadosList.find(e => e.nombre === this.newProceso.estado_badge) : null;
+                    const abgObj = this.equipo ? this.equipo.find(e => e.nombre === this.newProceso.abogado) : null;
+
                     const payload = {
+                        codigo_interno: this.newProceso.codigo,
+                        materia_id: matObj ? matObj.id : null,
                         materia: this.newProceso.materia,
+                        estado_id: estObj ? estObj.id : null,
+                        estado: this.newProceso.estado_badge,
                         delito_accion: this.newProceso.delito || 'Acción Jurídica',
                         demandante_denunciante: this.newProceso.denunciante,
                         demandado_denunciado: this.newProceso.denunciado,
+                        telefono: this.newProceso.telefono,
                         cud: this.newProceso.tipo === 'CUD' ? this.newProceso.codigo : null,
                         codigo_caso: this.newProceso.tipo === 'CASO' ? this.newProceso.codigo : null,
                         nurej: (this.newProceso.nurej && this.newProceso.nurej !== 'N/A') ? this.newProceso.nurej : null,
                         portal_fiscalia: this.newProceso.tipo === 'Portal Fis',
                         jurisdiccion: this.newProceso.ubicacion || 'CENTRO',
                         juzgado_tribunal: this.newProceso.juzgado,
-                        estado: this.newProceso.estado_badge,
                         estado_detalle: this.newProceso.estado,
                         nuevo_cliente_nombre: this.newProceso.denunciante,
                         abogado_id: abgObj ? abgObj.id : null
