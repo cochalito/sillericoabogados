@@ -33,7 +33,7 @@
           sidebarOpen: false, 
           desktopSidebarCollapsed: false,
           menus: {
-              procesos: {{ Request::is('procesos*', 'clientes*', 'documentos*', 'parametros*') ? 'true' : 'true' }},
+              procesos: {{ Request::is('procesos*', 'audiencias*', 'clientes*', 'documentos*', 'parametros*') ? 'true' : 'true' }},
               herramientas: {{ Request::is('articulos*', 'calendario*', 'auditoria*') ? 'true' : 'false' }},
               administracion: {{ Request::is('usuarios*', 'roles*') ? 'true' : 'false' }}
           },
@@ -104,9 +104,9 @@
                 <!-- Header / Toggle -->
                 <button type="button" 
                         @click="toggle('procesos')"
-                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all group {{ Request::is('procesos*', 'clientes*', 'documentos*', 'parametros*') ? 'text-brand-gold bg-white/5' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all group {{ Request::is('procesos*', 'audiencias*', 'clientes*', 'documentos*', 'parametros*') ? 'text-brand-gold bg-white/5' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                     <div class="flex items-center gap-3 min-w-0">
-                        <i data-lucide="folder-kanban" class="w-4 h-4 shrink-0 {{ Request::is('procesos*', 'clientes*', 'documentos*', 'parametros*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                        <i data-lucide="folder-kanban" class="w-4 h-4 shrink-0 {{ Request::is('procesos*', 'audiencias*', 'clientes*', 'documentos*', 'parametros*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
                         <span class="truncate transition-opacity duration-300 text-xs font-semibold uppercase tracking-wider" 
                               :class="{ 'opacity-0 w-0 hidden': desktopSidebarCollapsed }">
                             Control de Procesos
@@ -137,6 +137,18 @@
                         </div>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-gold/15 text-brand-gold">
                             {{ \App\Models\Proceso::count() }}
+                        </span>
+                    </a>
+
+                    <!-- Audiencias -->
+                    <a href="{{ url('/audiencias') }}" 
+                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group {{ Request::is('audiencias*') ? 'bg-brand-gold/15 text-brand-gold font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <i data-lucide="gavel" class="w-4 h-4 shrink-0 {{ Request::is('audiencias*') ? 'text-brand-gold' : 'text-slate-400 group-hover:text-white' }}"></i>
+                            <span class="truncate">Audiencias</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold">
+                            {{ \App\Models\EventoCalendario::where('tipo_evento', 'like', '%Audiencia%')->count() }}
                         </span>
                     </a>
 
