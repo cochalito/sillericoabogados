@@ -8,7 +8,7 @@
     <!-- Table and Filter Area -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
         <!-- Advanced Filters & Action Header -->
-        <div class="p-6 border-b border-slate-100 space-y-4">
+        <div class="p-[18px] border-b border-slate-100 space-y-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <!-- Action Button in Header -->
                 <button @click="$dispatch('open-new-case-modal')" 
@@ -83,7 +83,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs text-slate-600">
-                    <template x-for="proceso in filteredCasos" :key="proceso.codigo">
+                    <template x-for="proceso in paginatedCasos" :key="proceso.id || proceso.codigo">
                         <tr class="hover:bg-slate-50/50 transition-colors cursor-pointer" @click="openProcesoDetails(proceso)">
                             <!-- Case Identifiers -->
                             <td class="py-4 px-4 font-medium text-slate-800 space-y-1">
@@ -97,7 +97,7 @@
                                     <span class="text-[10px] font-bold text-slate-400" x-text="proceso.ubicacion"></span>
                                 </div>
                                 <div class="text-xs font-bold text-brand-green" x-text="proceso.codigo"></div>
-                                <div class="text-[10px] text-slate-400" x-show="proceso.nurej !== 'N/A'" x-text="`NUREJ/IANUS: ${proceso.nurej}`"></div>
+                                <div class="text-[10px] text-slate-400" x-show="proceso.nurej && proceso.nurej !== 'N/A'" x-text="`NUREJ/IANUS: ${proceso.nurej}`"></div>
                             </td>
                             
                             <!-- Denunciante -->
@@ -109,21 +109,16 @@
                             <!-- Juzgado/Fiscalia -->
                             <td class="py-4 px-4 space-y-0.5">
                                 <div class="font-bold text-slate-800 leading-tight" x-text="proceso.juzgado"></div>
-                                <div class="text-[10px] text-slate-400" x-text="proceso.sala"></div>
-                                <div class="text-[10px] text-brand-gold font-medium" x-text="`Autoridad: ${proceso.fiscal}`"></div>
+                                <div class="text-[10px] text-slate-400" x-show="proceso.sala" x-text="proceso.sala"></div>
+                                <div class="text-[10px] text-brand-gold font-medium" x-show="proceso.fiscal" x-text="`Autoridad: ${proceso.fiscal}`"></div>
                             </td>
                             
                             <!-- Delito / Materia -->
                             <td class="py-4 px-4">
                                 <div class="mb-1">
                                     <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
-                                          :class="{
-                                            'bg-red-50 text-red-700 border border-red-100': proceso.materia === 'Penal',
-                                            'bg-blue-50 text-blue-700 border border-blue-100': proceso.materia === 'Civil',
-                                            'bg-emerald-50 text-emerald-700 border border-emerald-100': proceso.materia === 'Laboral',
-                                            'bg-purple-50 text-purple-700 border border-purple-100': proceso.materia === 'Corporativo',
-                                            'bg-rose-50 text-rose-700 border border-rose-100': proceso.materia === 'Familiar'
-                                          }" x-text="proceso.materia"></span>
+                                          :class="proceso.materia_badge || 'bg-slate-100 text-slate-700'"
+                                          x-text="proceso.materia"></span>
                                 </div>
                                 <div class="font-semibold text-slate-700 uppercase text-[10px] leading-tight" x-text="proceso.delito"></div>
                             </td>
@@ -132,12 +127,8 @@
                             <td class="py-4 px-4 space-y-1">
                                 <div>
                                     <span class="px-2 py-0.5 rounded-full text-[9px] font-bold"
-                                          :class="{
-                                            'bg-amber-50 text-brand-gold border border-brand-gold/30': proceso.estado_badge === 'Casación',
-                                            'bg-emerald-50 text-emerald-600 border border-emerald-100': proceso.estado_badge === 'Sentencia' || proceso.estado_badge === 'Conciliación',
-                                            'bg-rose-50 text-rose-600 border border-rose-100': proceso.estado_badge === 'Apelación' || proceso.estado_badge === 'Rebeldía',
-                                            'bg-slate-50 text-slate-500 border border-slate-200': proceso.estado_badge === 'Archivado'
-                                          }" x-text="proceso.estado_badge"></span>
+                                          :class="proceso.estado_color || 'bg-slate-100 text-slate-700 border border-slate-200'"
+                                          x-text="proceso.estado_badge"></span>
                                 </div>
                                 <p class="text-[11px] text-slate-500 line-clamp-3 leading-relaxed" x-text="proceso.estado"></p>
                             </td>
@@ -161,14 +152,53 @@
         </div>
         
         <!-- Table Footer Pagination -->
-        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between text-xs text-slate-400">
-            <span x-text="`Mostrando ${filteredCasos.length} de ${casos.length} procesos`"></span>
-            <div class="flex items-center gap-1">
-                <button class="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50" disabled>
-                    <i data-lucide="chevron-left" class="w-4 h-4 text-slate-400"></i>
+        <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+            <div class="flex items-center gap-3">
+                <span x-text="paginationSummary"></span>
+                <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
+                    <span>Filas:</span>
+                    <select x-model.number="perPage" 
+                            class="bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-xs font-semibold text-slate-600 focus:outline-none focus:border-brand-gold">
+                        <option :value="10">10</option>
+                        <option :value="20">20</option>
+                        <option :value="50">50</option>
+                        <option :value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1" x-show="totalPages > 1">
+                <!-- Anterior -->
+                <button @click="prevPage()" 
+                        :disabled="currentPage === 1"
+                        class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-semibold text-xs flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Anterior</span>
                 </button>
-                <button class="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50" disabled>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+
+                <!-- Páginas Numeradas -->
+                <div class="flex items-center gap-1">
+                    <template x-for="(page, idx) in pageNumbers" :key="idx">
+                        <div>
+                            <template x-if="page === '...'">
+                                <span class="px-2 py-1 text-slate-400 text-xs font-bold select-none">...</span>
+                            </template>
+                            <template x-if="page !== '...'">
+                                <button @click="goToPage(page)" 
+                                        class="min-w-8 h-8 px-2 rounded-lg text-xs font-bold transition-all"
+                                        :class="currentPage === page ? 'bg-brand-green text-white shadow-xs' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'"
+                                        x-text="page"></button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Siguiente -->
+                <button @click="nextPage()" 
+                        :disabled="currentPage >= totalPages"
+                        class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-semibold text-xs flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs">
+                    <span class="hidden sm:inline">Siguiente</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
         </div>
@@ -945,6 +975,70 @@
 
                     return matchesSearch && matchesMateria && matchesEstado && matchesAbogado;
                 });
+            },
+
+            // Paginación
+            currentPage: 1,
+            perPage: 10,
+
+            get totalPages() {
+                return Math.ceil(this.filteredCasos.length / this.perPage) || 1;
+            },
+
+            get paginatedCasos() {
+                const start = (this.currentPage - 1) * this.perPage;
+                return this.filteredCasos.slice(start, start + this.perPage);
+            },
+
+            get paginationSummary() {
+                if (this.filteredCasos.length === 0) return 'Sin causas registradas';
+                const start = (this.currentPage - 1) * this.perPage + 1;
+                const end = Math.min(this.currentPage * this.perPage, this.filteredCasos.length);
+                return `Mostrando ${start} - ${end} de ${this.filteredCasos.length} procesos (${this.casos.length} en total)`;
+            },
+
+            get pageNumbers() {
+                const total = this.totalPages;
+                const current = this.currentPage;
+                if (total <= 7) {
+                    return Array.from({ length: total }, (_, i) => i + 1);
+                }
+                if (current <= 4) {
+                    return [1, 2, 3, 4, 5, '...', total];
+                }
+                if (current >= total - 3) {
+                    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+                }
+                return [1, '...', current - 1, current, current + 1, '...', total];
+            },
+
+            prevPage() {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.$nextTick(() => window.lucide && window.lucide.createIcons());
+                }
+            },
+
+            nextPage() {
+                if (this.currentPage < this.totalPages) {
+                    this.currentPage++;
+                    this.$nextTick(() => window.lucide && window.lucide.createIcons());
+                }
+            },
+
+            goToPage(p) {
+                if (typeof p === 'number' && p >= 1 && p <= this.totalPages) {
+                    this.currentPage = p;
+                    this.$nextTick(() => window.lucide && window.lucide.createIcons());
+                }
+            },
+
+            init() {
+                this.$watch('searchQuery', () => { this.currentPage = 1; });
+                this.$watch('selectedMateria', () => { this.currentPage = 1; });
+                this.$watch('selectedEstado', () => { this.currentPage = 1; });
+                this.$watch('selectedAbogado', () => { this.currentPage = 1; });
+                this.$watch('perPage', () => { this.currentPage = 1; });
             },
 
             openProcesoDetails(proceso) {

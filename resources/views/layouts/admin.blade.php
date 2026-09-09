@@ -523,7 +523,7 @@
         </header>
 
         <!-- MAIN BODY CONTENT -->
-        <main class="flex-1 p-6 md:p-8">
+        <main class="flex-1 p-[10px]">
             @yield('content')
         </main>
         
