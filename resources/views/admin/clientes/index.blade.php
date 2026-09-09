@@ -5,15 +5,10 @@
 
 @section('content')
 <div x-data="clientesData()" class="space-y-6 animate-fade-in">
-    <!-- Breadcrumbs & New Client Button -->
+    <!-- Header & New Client Button -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                <a href="{{ url('/') }}" class="hover:text-brand-green">Inicio</a>
-                <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                <span class="text-slate-600">Clientes</span>
-            </div>
-            <h2 class="text-2xl font-bold tracking-tight text-brand-green mt-1">Directorio de Clientes</h2>
+            <h2 class="text-2xl font-bold tracking-tight text-brand-green">Directorio de Clientes</h2>
         </div>
         <button @click="newClientModalOpen = true" 
                 class="flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-colors">

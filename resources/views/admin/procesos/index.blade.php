@@ -1,42 +1,17 @@
 @extends('layouts.admin')
 
 @section('title', 'Procesos - Sillerico & Abogados')
-@section('header_title', 'Control de Procesos Jurídicos')
+@section('header_title', 'Control de Procesos')
 
 @section('content')
 <div x-data="procesosData()" class="space-y-6 animate-fade-in">
-    <!-- Breadcrumbs & New Process Button -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                <a href="{{ url('/') }}" class="hover:text-brand-green">Inicio</a>
-                <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                <span class="text-slate-600">Procesos</span>
-            </div>
-            <h2 class="text-2xl font-bold tracking-tight text-brand-green mt-1">Archivo de Procesos</h2>
-        </div>
+    <!-- Action Bar -->
+    <div class="flex items-center justify-end">
         <button @click="$dispatch('open-new-case-modal')" 
-                class="flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-colors">
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01]">
             <i data-lucide="folder-plus" class="w-4 h-4"></i>
             Registrar Nuevo Proceso
         </button>
-    </div>
-
-    <!-- Quick Stats Summary -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <template x-for="stat in stats" :key="stat.label">
-            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs flex items-center justify-between group hover:border-brand-gold/30 transition-all cursor-pointer"
-                 @click="selectedMateria = stat.value">
-                <div class="space-y-0.5">
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider" x-text="stat.label"></span>
-                    <h4 class="text-xl font-bold text-brand-green" x-text="stat.count"></h4>
-                </div>
-                <div class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-brand-gold/10 group-hover:text-brand-gold transition-colors"
-                     :class="{ 'bg-brand-green/5 text-brand-green': selectedMateria === stat.value }">
-                    <i :data-lucide="stat.icon" class="w-4.5 h-4.5"></i>
-                </div>
-            </div>
-        </template>
     </div>
 
     <!-- Table and Filter Area -->

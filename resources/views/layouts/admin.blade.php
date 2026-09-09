@@ -342,8 +342,8 @@
                 <button @click="desktopSidebarCollapsed = !desktopSidebarCollapsed" class="hidden p-2 rounded-lg lg:flex hover:bg-slate-50 text-slate-400 hover:text-slate-600">
                     <i data-lucide="align-justify" class="w-5 h-5"></i>
                 </button>
-                <!-- Breadcrumbs/Title -->
-                <h1 class="hidden md:block text-base font-semibold text-slate-800">
+                <!-- Toolbar Title -->
+                <h1 class="text-sm sm:text-base font-bold text-slate-800 tracking-tight">
                     @yield('header_title', 'Panel de Administración')
                 </h1>
             </div>

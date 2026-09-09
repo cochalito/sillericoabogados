@@ -5,15 +5,10 @@
 
 @section('content')
 <div x-data="usuariosData()" class="space-y-6 animate-fade-in">
-    <!-- Breadcrumbs & Action Button -->
+    <!-- Header & Action Button -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                <a href="{{ url('/') }}" class="hover:text-brand-green">Inicio</a>
-                <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                <span class="text-slate-600">Equipo Legal</span>
-            </div>
-            <h2 class="text-2xl font-bold tracking-tight text-brand-green mt-1">Operadores y Abogados del Bufete</h2>
+            <h2 class="text-2xl font-bold tracking-tight text-brand-green">Operadores y Abogados del Bufete</h2>
             <p class="text-xs text-slate-500">Administración de las 6 cuentas operativas para control de autoría y auditoría de procesos.</p>
         </div>
 
