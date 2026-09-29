@@ -10,18 +10,15 @@
         <!-- Encabezado de Acciones y Herramientas -->
         <div class="border-b border-slate-100 shrink-0" style="padding: 12px 18px !important; flex-shrink: 0;">
             <div class="flex items-center justify-between gap-3">
-                <!-- Alineado a la izquierda: Botón de configuración de columnas (icono de ecualizador) -->
-                <div class="flex items-center gap-2">
-                    <button type="button" 
-                            @click="columnsConfigModalOpen = true"
-                            title="Configuración de columnas"
-                            class="inline-flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer">
-                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <!-- Alineado a la derecha: Botón filtro (solo icono) + Botón Nuevo proceso -->
+                <!-- Alineado a la izquierda: Botón Nuevo proceso + Botón de filtro -->
                 <div class="flex items-center gap-2.5">
+                    <!-- Botón Nuevo proceso -->
+                    <button @click="openCreateProceso()" 
+                            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01] shrink-0 cursor-pointer">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        Nuevo proceso
+                    </button>
+
                     <!-- Botón filtro (solo icono) -->
                     <button type="button" 
                             @click="openFilterModal()"
@@ -29,12 +26,15 @@
                             class="inline-flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer">
                         <i data-lucide="filter" class="w-4 h-4"></i>
                     </button>
+                </div>
 
-                    <!-- Botón Nuevo proceso -->
-                    <button @click="openCreateProceso()" 
-                            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01] shrink-0 cursor-pointer">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        Nuevo proceso
+                <!-- Alineado a la derecha: Botón de configuración de columnas (icono de ecualizador) -->
+                <div class="flex items-center gap-2">
+                    <button type="button" 
+                            @click="columnsConfigModalOpen = true"
+                            title="Configuración de columnas"
+                            class="inline-flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
