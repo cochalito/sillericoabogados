@@ -4,6 +4,17 @@
 @section('header_title', 'Control de Procesos')
 
 @section('content')
+<style>
+    .btn-primary {
+        background-color: var(--color-brand-green, #082a20) !important;
+        color: #F7E8A7 !important;
+        font-weight: 700 !important;
+        transition: all 0.2s ease-in-out !important;
+    }
+    .btn-primary:hover {
+        background-color: var(--color-brand-green-hover, #0c3d2f) !important;
+    }
+</style>
 <div x-data="procesosData()" @open-new-case-modal.window="openCreateProceso()" class="flex-1 min-h-0 flex flex-col w-full h-full animate-fade-in overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden !important;">
     <!-- Table and Filter Area -->
     <div x-show="currentView === 'list'" class="bg-white rounded-2xl border border-slate-100 shadow-xs flex-1 min-h-0 flex flex-col w-full h-full overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden !important;">
@@ -14,9 +25,9 @@
                 <div class="flex items-center gap-2.5">
                     <!-- Botón Nuevo proceso -->
                     <button @click="openCreateProceso()" 
-                            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01] shrink-0 cursor-pointer">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        Nuevo proceso
+                            class="btn-primary inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-green hover:bg-brand-green-hover text-[#F7E8A7] font-bold text-xs rounded-xl shadow-sm transition-all duration-200 hover:scale-[1.01] active:scale-95 shrink-0 cursor-pointer">
+                        <i data-lucide="plus" class="w-4 h-4 text-[#F7E8A7]"></i>
+                        <span>Nuevo proceso</span>
                     </button>
 
                     <!-- Botón filtro (solo icono) -->
@@ -44,14 +55,14 @@
         <div class="flex-1 min-h-0 overflow-y-auto overflow-x-auto" style="flex: 1 1 0px !important; min-height: 0 !important; overflow-y: auto !important;">
             <table class="w-full text-left border-collapse min-w-[1000px]">
                 <thead class="sticky top-0 z-10 bg-slate-50 shadow-2xs">
-                    <tr class="border-b border-slate-200 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
-                        <th class="py-3 px-4 w-[16%] bg-slate-50">Nro. de Caso / CUD / NUREJ</th>
-                        <th class="py-3 px-4 w-[12%] bg-slate-50">Denunciante</th>
-                        <th class="py-3 px-4 w-[12%] bg-slate-50">Denunciado</th>
-                        <th class="py-3 px-4 w-[16%] bg-slate-50">Juzgado / Fiscalía</th>
-                        <th class="py-3 px-4 w-[14%] bg-slate-50">Delito / Acción</th>
-                        <th class="py-3 px-4 w-[24%] bg-slate-50">Estado del Proceso</th>
-                        <th class="py-3 px-4 w-[6%] bg-slate-50 text-right">Acción</th>
+                    <tr class="border-b border-slate-200 text-xs sm:text-[13px] font-bold tracking-wider text-slate-700 uppercase">
+                        <th class="py-3.5 px-4 w-[16%] bg-slate-50">Nro. de Caso / CUD / NUREJ</th>
+                        <th class="py-3.5 px-4 w-[12%] bg-slate-50">Denunciante</th>
+                        <th class="py-3.5 px-4 w-[12%] bg-slate-50">Denunciado</th>
+                        <th class="py-3.5 px-4 w-[16%] bg-slate-50">Juzgado / Fiscalía</th>
+                        <th class="py-3.5 px-4 w-[14%] bg-slate-50">Delito / Acción</th>
+                        <th class="py-3.5 px-4 w-[24%] bg-slate-50">Estado del Proceso</th>
+                        <th class="py-3.5 px-4 w-[6%] bg-slate-50 text-right">Acción</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs text-slate-600">
