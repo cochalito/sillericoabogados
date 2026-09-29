@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'switch-user*',
             'usuarios*',
             'auditoria*',
+            'login*',
+            'logout*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

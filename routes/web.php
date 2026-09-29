@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActuacionController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ClienteController;
@@ -8,6 +9,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProcesoController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
+
+// 0. Autenticación Institucional & Manejo de Sesiones (Estilo Microsoft Account)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login/check-user', [AuthController::class, 'checkUser'])->name('login.check-user');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 // 1. Dashboard Principal
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
