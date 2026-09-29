@@ -51,42 +51,49 @@
             </div>
         </div>
 
-        <!-- Table View with Scrollable Rows -->
-        <div id="procesosTableContainer" class="flex-1 min-h-0 overflow-y-auto overflow-x-auto" style="flex: 1 1 0px !important; min-height: 0 !important; overflow-y: auto !important;">
-            <table class="text-left border-collapse" :style="'table-layout: fixed; width: ' + totalTableWidth + 'px; min-width: 100%;'">
+        <!-- Table View with Scrollable Rows (NO horizontal scroll) -->
+        <div id="procesosTableContainer" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden" style="flex: 1 1 0px !important; min-height: 0 !important; overflow-y: auto !important; overflow-x: hidden !important;">
+            <table class="w-full text-left border-collapse table-fixed select-none" style="width: 100% !important; table-layout: fixed !important;">
                 <thead class="sticky top-0 z-10 bg-slate-50 shadow-2xs select-none">
-                    <tr class="border-b border-slate-200 text-[13px] font-bold tracking-wider text-slate-700 uppercase">
+                    <tr class="border-b border-slate-200 text-xs sm:text-[13px] font-bold tracking-wider text-slate-700 uppercase">
                         <template x-for="(col, colIndex) in columns" :key="col.id">
-                            <th class="relative py-3.5 px-3.5 bg-slate-50 border-r border-slate-200 transition-colors group select-none"
+                            <th class="relative py-3.5 px-3 bg-slate-50 border-r border-slate-200 transition-colors select-none group"
                                 :class="{
                                     'text-right': col.align === 'right',
-                                    'opacity-40 bg-slate-200 border-dashed border-2 border-brand-green/60': draggedColIndex === colIndex,
-                                    'border-l-4 border-l-brand-gold bg-amber-50/70': dragOverColIndex === colIndex && draggedColIndex !== colIndex
+                                    'opacity-40 bg-slate-100': draggedColIndex === colIndex
                                 }"
-                                :style="'width:' + col.width + 'px; min-width:' + (col.minWidth || 60) + 'px;'"
+                                :style="'width: ' + col.width + '%;'"
                                 :draggable="!isResizing"
                                 @dragstart="onColDragStart($event, colIndex)"
                                 @dragover.prevent="onColDragOver($event, colIndex)"
                                 @dragleave="onColDragLeave($event, colIndex)"
                                 @drop.prevent="onColDrop($event, colIndex)"
                                 @dragend="onColDragEnd($event)">
+
+                                <!-- Drop Indicator Line (Clean, Notion-style golden line on drop target) -->
+                                <div x-show="dragOverColIndex === colIndex && draggedColIndex !== colIndex"
+                                     class="absolute left-0 top-0 bottom-0 w-1 bg-brand-gold z-30 pointer-events-none"
+                                     x-cloak>
+                                    <div class="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-brand-gold shadow-xs"></div>
+                                    <div class="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-brand-gold shadow-xs"></div>
+                                </div>
                                 
                                 <div class="flex items-center gap-1.5 w-full"
                                      :class="col.align === 'right' ? 'justify-end' : 'justify-between'"
                                      :role="col.sortable ? 'button' : undefined"
-                                     @click="col.sortable ? toggleSort(col.id) : null"
+                                     @click="col.sortable && !justDragged && !isResizing ? toggleSort(col.id) : null"
                                      :title="col.sortable ? 'Clic para ordenar' : ''"
                                      :style="col.sortable ? 'cursor: pointer;' : 'cursor: default;'">
                                     
-                                    <!-- Label with drag gripper on hover -->
+                                    <!-- Label with drag gripper -->
                                     <div class="flex items-center gap-1.5 min-w-0 pr-1">
-                                        <span class="opacity-0 group-hover:opacity-60 text-slate-400 cursor-grab active:cursor-grabbing shrink-0 transition-opacity" title="Arrastrar para mover columna">
-                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <span class="text-slate-300 group-hover:text-slate-500 cursor-grab active:cursor-grabbing shrink-0 transition-colors" title="Arrastrar para mover columna">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/>
                                                 <circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/>
                                             </svg>
                                         </span>
-                                        <span class="truncate font-bold" x-text="col.label"></span>
+                                        <span class="truncate font-bold text-xs sm:text-[13px]" x-text="col.label"></span>
                                     </div>
 
                                     <!-- Sort Indicators -->
@@ -114,13 +121,15 @@
                                     </template>
                                 </div>
 
-                                <!-- Excel-Style Column Resizer Handle -->
-                                <div class="absolute right-0 top-0 bottom-0 w-2.5 cursor-col-resize select-none z-20 group/resizer flex items-center justify-center hover:bg-brand-gold/60 active:bg-brand-green transition-colors"
-                                     @mousedown.stop.prevent="startColResize(col, $event)"
-                                     @dblclick.stop.prevent="resetColumns()"
-                                     title="Arrastrar para ajustar ancho (Doble clic para restablecer)">
-                                    <div class="w-[2px] h-4 bg-slate-300 group-hover/resizer:bg-brand-green"></div>
-                                </div>
+                                <!-- Excel-Style Column Resizer Handle (Between colIndex and colIndex + 1) -->
+                                <template x-if="colIndex < columns.length - 1">
+                                    <div class="absolute -right-1.5 top-0 bottom-0 w-3 cursor-col-resize select-none z-20 group/resizer flex items-center justify-center"
+                                         @mousedown.stop.prevent="startColResize(colIndex, $event)"
+                                         title="Arrastrar para ajustar ancho">
+                                        <div class="w-[3px] h-full transition-colors rounded-full"
+                                             :class="isResizing && resizingColIndex === colIndex ? 'bg-brand-gold' : 'bg-transparent group-hover/resizer:bg-brand-gold/70'"></div>
+                                    </div>
+                                </template>
                             </th>
                         </template>
                     </tr>
@@ -129,9 +138,9 @@
                     <template x-for="proceso in paginatedCasos" :key="proceso.id || proceso.codigo">
                         <tr class="hover:bg-slate-50/50 transition-colors cursor-pointer" @click="openProcesoDetails(proceso)">
                             <template x-for="col in columns" :key="col.id">
-                                <td class="py-3.5 px-3.5 border-r border-slate-100 align-top overflow-hidden"
+                                <td class="py-3.5 px-3 border-r border-slate-100 align-top overflow-hidden"
                                     :class="col.align === 'right' ? 'text-right' : ''"
-                                    :style="'width:' + col.width + 'px; min-width:' + (col.minWidth || 60) + 'px;'">
+                                    :style="'width: ' + col.width + '%;'">
                                     
                                     <!-- Case Identifiers -->
                                     <div x-show="col.id === 'codigo'" class="font-medium text-slate-800 space-y-1">
@@ -142,37 +151,37 @@
                                                     'bg-amber-100 text-brand-gold': proceso.tipo && proceso.tipo.includes('CUD'),
                                                     'bg-blue-100 text-blue-800': proceso.tipo && proceso.tipo.includes('CASO')
                                                   }" x-text="proceso.tipo"></span>
-                                            <span class="text-[10px] font-bold text-slate-400" x-text="proceso.ubicacion"></span>
+                                            <span class="text-[10px] font-bold text-slate-400 truncate" x-text="proceso.ubicacion"></span>
                                         </div>
                                         <div class="text-xs font-bold text-brand-green truncate" x-text="proceso.codigo"></div>
                                         <div class="text-[10px] text-slate-400 truncate" x-show="proceso.nurej && proceso.nurej !== 'N/A'" x-text="`NUREJ: ${proceso.nurej}`"></div>
                                     </div>
                                     
                                     <!-- Denunciante -->
-                                    <div x-show="col.id === 'denunciante'" class="font-semibold text-slate-800 uppercase break-words" x-text="proceso.denunciante"></div>
+                                    <div x-show="col.id === 'denunciante'" class="font-semibold text-slate-800 uppercase text-xs break-words" x-text="proceso.denunciante"></div>
                                     
                                     <!-- Denunciado -->
-                                    <div x-show="col.id === 'denunciado'" class="font-bold text-slate-900 uppercase break-words" x-text="proceso.denunciado"></div>
+                                    <div x-show="col.id === 'denunciado'" class="font-bold text-slate-900 uppercase text-xs break-words" x-text="proceso.denunciado"></div>
                                     
                                     <!-- Juzgado/Fiscalia -->
-                                    <div x-show="col.id === 'juzgado'" class="space-y-0.5">
+                                    <div x-show="col.id === 'juzgado'" class="space-y-0.5 text-xs">
                                         <div class="font-bold text-slate-800 leading-tight" x-text="proceso.juzgado"></div>
                                         <div class="text-[10px] text-slate-400" x-show="proceso.sala" x-text="proceso.sala"></div>
-                                        <div class="text-[10px] text-brand-gold font-medium" x-show="proceso.fiscal" x-text="`Autoridad: ${proceso.fiscal}`"></div>
+                                        <div class="text-[10px] text-brand-gold font-medium truncate" x-show="proceso.fiscal" x-text="`Autoridad: ${proceso.fiscal}`"></div>
                                     </div>
                                     
                                     <!-- Delito / Materia -->
-                                    <div x-show="col.id === 'delito'" class="space-y-1">
+                                    <div x-show="col.id === 'delito'" class="space-y-1 text-xs">
                                         <div>
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
                                                   :class="proceso.materia_badge || 'bg-slate-100 text-slate-700'"
                                                   x-text="proceso.materia"></span>
                                         </div>
-                                        <div class="font-bold text-slate-800 uppercase text-xs leading-snug" x-text="proceso.delito"></div>
+                                        <div class="font-bold text-slate-800 uppercase text-xs leading-snug break-words" x-text="proceso.delito"></div>
                                     </div>
                                     
                                     <!-- Estado del Proceso -->
-                                    <div x-show="col.id === 'estado'" class="space-y-1.5">
+                                    <div x-show="col.id === 'estado'" class="space-y-1.5 text-xs">
                                         <div>
                                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
                                                   :class="proceso.estado_color || 'bg-slate-100 text-slate-700 border border-slate-200'"
@@ -2139,35 +2148,34 @@
             sortKey: '',
             sortDir: 'asc', // 'asc' | 'desc'
             isResizing: false,
-            resizingCol: null,
+            resizingColIndex: null,
             startX: 0,
-            startWidth: 0,
-            hasUserResized: false,
+            startPctLeft: 0,
+            startPctRight: 0,
+            tablePixelWidth: 1000,
             draggedColIndex: null,
             dragOverColIndex: null,
+            isDragging: false,
+            justDragged: false,
 
             columns: [
-                { id: 'codigo', label: 'Nro. de Caso / CUD / NUREJ', minWidth: 160, width: 200, sortable: true },
-                { id: 'denunciante', label: 'Denunciante', minWidth: 120, width: 150, sortable: true },
-                { id: 'denunciado', label: 'Denunciado', minWidth: 120, width: 150, sortable: true },
-                { id: 'juzgado', label: 'Juzgado / Fiscalía', minWidth: 150, width: 200, sortable: true },
-                { id: 'delito', label: 'Delito / Acción', minWidth: 130, width: 160, sortable: true },
-                { id: 'estado', label: 'Estado del Proceso', minWidth: 180, width: 230, sortable: true },
-                { id: 'accion', label: 'Acción', minWidth: 70, width: 80, sortable: false, align: 'right' }
+                { id: 'codigo', label: 'Nro. de Caso / CUD / NUREJ', width: 17, sortable: true },
+                { id: 'denunciante', label: 'Denunciante', width: 13, sortable: true },
+                { id: 'denunciado', label: 'Denunciado', width: 13, sortable: true },
+                { id: 'juzgado', label: 'Juzgado / Fiscalía', width: 17, sortable: true },
+                { id: 'delito', label: 'Delito / Acción', width: 14, sortable: true },
+                { id: 'estado', label: 'Estado del Proceso', width: 20, sortable: true },
+                { id: 'accion', label: 'Acción', width: 6, sortable: false, align: 'right' }
             ],
             defaultColumns: [
-                { id: 'codigo', label: 'Nro. de Caso / CUD / NUREJ', minWidth: 160, width: 200, sortable: true },
-                { id: 'denunciante', label: 'Denunciante', minWidth: 120, width: 150, sortable: true },
-                { id: 'denunciado', label: 'Denunciado', minWidth: 120, width: 150, sortable: true },
-                { id: 'juzgado', label: 'Juzgado / Fiscalía', minWidth: 150, width: 200, sortable: true },
-                { id: 'delito', label: 'Delito / Acción', minWidth: 130, width: 160, sortable: true },
-                { id: 'estado', label: 'Estado del Proceso', minWidth: 180, width: 230, sortable: true },
-                { id: 'accion', label: 'Acción', minWidth: 70, width: 80, sortable: false, align: 'right' }
+                { id: 'codigo', label: 'Nro. de Caso / CUD / NUREJ', width: 17, sortable: true },
+                { id: 'denunciante', label: 'Denunciante', width: 13, sortable: true },
+                { id: 'denunciado', label: 'Denunciado', width: 13, sortable: true },
+                { id: 'juzgado', label: 'Juzgado / Fiscalía', width: 17, sortable: true },
+                { id: 'delito', label: 'Delito / Acción', width: 14, sortable: true },
+                { id: 'estado', label: 'Estado del Proceso', width: 20, sortable: true },
+                { id: 'accion', label: 'Acción', width: 6, sortable: false, align: 'right' }
             ],
-
-            get totalTableWidth() {
-                return this.columns.reduce((sum, col) => sum + (Number(col.width) || 100), 0);
-            },
             
             // Statistics derived dynamically
             get stats() {
@@ -2356,6 +2364,7 @@
             },
 
             toggleSort(colId) {
+                if (this.isResizing || this.justDragged) return;
                 const col = this.columns.find(c => c.id === colId);
                 if (!col || !col.sortable) return;
                 
@@ -2376,68 +2385,62 @@
                 });
             },
 
-            initColumnWidths() {
-                const container = document.getElementById('procesosTableContainer');
-                if (!container) return;
-                const totalW = container.clientWidth;
-                if (totalW < 300) return;
-                
-                const ratios = {
-                    codigo: 0.17,
-                    denunciante: 0.13,
-                    denunciado: 0.13,
-                    juzgado: 0.17,
-                    delito: 0.14,
-                    estado: 0.20,
-                    accion: 0.06
-                };
-                
-                let allocated = 0;
-                this.columns.forEach((c, idx) => {
-                    if (idx === this.columns.length - 1) {
-                        c.width = Math.max(c.minWidth || 60, totalW - allocated);
-                    } else {
-                        const ratio = ratios[c.id] || (1 / this.columns.length);
-                        const w = Math.max(c.minWidth || 60, Math.floor(totalW * ratio));
-                        c.width = w;
-                        allocated += w;
-                    }
-                });
-            },
-
             resetColumns() {
                 this.columns = JSON.parse(JSON.stringify(this.defaultColumns));
-                this.hasUserResized = false;
-                this.initColumnWidths();
                 this.columnsConfigModalOpen = false;
                 this.$nextTick(() => {
                     if (window.lucide) window.lucide.createIcons();
                 });
             },
 
-            startColResize(col, event) {
-                this.hasUserResized = true;
+            startColResize(colIndex, event) {
+                if (colIndex >= this.columns.length - 1) return;
+                event.stopPropagation();
+                event.preventDefault();
+
                 this.isResizing = true;
-                this.resizingCol = col;
+                this.resizingColIndex = colIndex;
                 this.startX = event.clientX;
-                this.startWidth = col.width || 120;
-                
+                this.startPctLeft = Number(this.columns[colIndex].width);
+                this.startPctRight = Number(this.columns[colIndex + 1].width);
+
+                const container = document.getElementById('procesosTableContainer');
+                const tableWidth = container ? container.clientWidth : 1000;
+                this.tablePixelWidth = tableWidth > 0 ? tableWidth : 1000;
+
                 const onMouseMove = (e) => {
-                    if (!this.isResizing || !this.resizingCol) return;
-                    const delta = e.clientX - this.startX;
-                    const newWidth = Math.max(this.resizingCol.minWidth || 60, this.startWidth + delta);
-                    this.resizingCol.width = newWidth;
+                    if (!this.isResizing) return;
+                    const deltaX = e.clientX - this.startX;
+                    const deltaPct = (deltaX / this.tablePixelWidth) * 100;
+
+                    const totalPairPct = this.startPctLeft + this.startPctRight;
+                    const minPct = 4; // minimum width percentage
+
+                    let newLeft = this.startPctLeft + deltaPct;
+                    let newRight = this.startPctRight - deltaPct;
+
+                    if (newLeft < minPct) {
+                        newLeft = minPct;
+                        newRight = totalPairPct - minPct;
+                    } else if (newRight < minPct) {
+                        newRight = minPct;
+                        newLeft = totalPairPct - minPct;
+                    }
+
+                    this.columns[colIndex].width = Math.round(newLeft * 10) / 10;
+                    this.columns[colIndex + 1].width = Math.round(newRight * 10) / 10;
                 };
-                
+
                 const onMouseUp = () => {
                     this.isResizing = false;
-                    this.resizingCol = null;
+                    this.resizingColIndex = null;
                     window.removeEventListener('mousemove', onMouseMove);
                     window.removeEventListener('mouseup', onMouseUp);
                     document.body.style.cursor = '';
                     document.body.style.userSelect = '';
+                    setTimeout(() => { this.justDragged = false; }, 150);
                 };
-                
+
                 document.body.style.cursor = 'col-resize';
                 document.body.style.userSelect = 'none';
                 window.addEventListener('mousemove', onMouseMove);
@@ -2450,21 +2453,31 @@
                     return;
                 }
                 this.draggedColIndex = index;
+                this.isDragging = true;
+                this.justDragged = true;
                 event.dataTransfer.effectAllowed = 'move';
                 event.dataTransfer.setData('text/plain', String(index));
             },
 
             onColDragOver(event, index) {
-                if (this.draggedColIndex === null) return;
+                if (this.draggedColIndex === null || this.draggedColIndex === index) return;
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'move';
-                if (this.dragOverColIndex !== index) {
-                    this.dragOverColIndex = index;
-                }
+                this.dragOverColIndex = index;
             },
 
             onColDragLeave(event, index) {
-                // Smooth UX
+                const rect = event.currentTarget.getBoundingClientRect();
+                if (
+                    event.clientX < rect.left ||
+                    event.clientX >= rect.right ||
+                    event.clientY < rect.top ||
+                    event.clientY >= rect.bottom
+                ) {
+                    if (this.dragOverColIndex === index) {
+                        this.dragOverColIndex = null;
+                    }
+                }
             },
 
             onColDrop(event, targetIndex) {
@@ -2475,6 +2488,8 @@
                 }
                 this.draggedColIndex = null;
                 this.dragOverColIndex = null;
+                this.isDragging = false;
+                setTimeout(() => { this.justDragged = false; }, 150);
                 this.$nextTick(() => {
                     if (window.lucide) window.lucide.createIcons();
                 });
@@ -2483,6 +2498,8 @@
             onColDragEnd(event) {
                 this.draggedColIndex = null;
                 this.dragOverColIndex = null;
+                this.isDragging = false;
+                setTimeout(() => { this.justDragged = false; }, 150);
             },
 
             moveColumn(index, direction) {
@@ -2503,14 +2520,7 @@
                 this.$watch('perPage', () => { this.currentPage = 1; });
 
                 this.$nextTick(() => {
-                    this.initColumnWidths();
                     if (window.lucide) window.lucide.createIcons();
-                });
-
-                window.addEventListener('resize', () => {
-                    if (!this.hasUserResized) {
-                        this.initColumnWidths();
-                    }
                 });
             },
 
