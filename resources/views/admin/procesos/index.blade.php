@@ -52,85 +52,155 @@
         </div>
 
         <!-- Table View with Scrollable Rows -->
-        <div class="flex-1 min-h-0 overflow-y-auto overflow-x-auto" style="flex: 1 1 0px !important; min-height: 0 !important; overflow-y: auto !important;">
-            <table class="w-full text-left border-collapse min-w-[1000px]">
-                <thead class="sticky top-0 z-10 bg-slate-50 shadow-2xs">
-                    <tr class="border-b border-slate-200 text-xs sm:text-[13px] font-bold tracking-wider text-slate-700 uppercase">
-                        <th class="py-3.5 px-4 w-[16%] bg-slate-50">Nro. de Caso / CUD / NUREJ</th>
-                        <th class="py-3.5 px-4 w-[12%] bg-slate-50">Denunciante</th>
-                        <th class="py-3.5 px-4 w-[12%] bg-slate-50">Denunciado</th>
-                        <th class="py-3.5 px-4 w-[16%] bg-slate-50">Juzgado / Fiscalía</th>
-                        <th class="py-3.5 px-4 w-[14%] bg-slate-50">Delito / Acción</th>
-                        <th class="py-3.5 px-4 w-[24%] bg-slate-50">Estado del Proceso</th>
-                        <th class="py-3.5 px-4 w-[6%] bg-slate-50 text-right">Acción</th>
+        <div id="procesosTableContainer" class="flex-1 min-h-0 overflow-y-auto overflow-x-auto" style="flex: 1 1 0px !important; min-height: 0 !important; overflow-y: auto !important;">
+            <table class="text-left border-collapse" :style="'table-layout: fixed; width: ' + totalTableWidth + 'px; min-width: 100%;'">
+                <thead class="sticky top-0 z-10 bg-slate-50 shadow-2xs select-none">
+                    <tr class="border-b border-slate-200 text-[13px] font-bold tracking-wider text-slate-700 uppercase">
+                        <template x-for="(col, colIndex) in columns" :key="col.id">
+                            <th class="relative py-3.5 px-3.5 bg-slate-50 border-r border-slate-200 transition-colors group select-none"
+                                :class="{
+                                    'text-right': col.align === 'right',
+                                    'opacity-40 bg-slate-200 border-dashed border-2 border-brand-green/60': draggedColIndex === colIndex,
+                                    'border-l-4 border-l-brand-gold bg-amber-50/70': dragOverColIndex === colIndex && draggedColIndex !== colIndex
+                                }"
+                                :style="'width:' + col.width + 'px; min-width:' + (col.minWidth || 60) + 'px;'"
+                                :draggable="!isResizing"
+                                @dragstart="onColDragStart($event, colIndex)"
+                                @dragover.prevent="onColDragOver($event, colIndex)"
+                                @dragleave="onColDragLeave($event, colIndex)"
+                                @drop.prevent="onColDrop($event, colIndex)"
+                                @dragend="onColDragEnd($event)">
+                                
+                                <div class="flex items-center gap-1.5 w-full"
+                                     :class="col.align === 'right' ? 'justify-end' : 'justify-between'"
+                                     :role="col.sortable ? 'button' : undefined"
+                                     @click="col.sortable ? toggleSort(col.id) : null"
+                                     :title="col.sortable ? 'Clic para ordenar' : ''"
+                                     :style="col.sortable ? 'cursor: pointer;' : 'cursor: default;'">
+                                    
+                                    <!-- Label with drag gripper on hover -->
+                                    <div class="flex items-center gap-1.5 min-w-0 pr-1">
+                                        <span class="opacity-0 group-hover:opacity-60 text-slate-400 cursor-grab active:cursor-grabbing shrink-0 transition-opacity" title="Arrastrar para mover columna">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/>
+                                                <circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/>
+                                            </svg>
+                                        </span>
+                                        <span class="truncate font-bold" x-text="col.label"></span>
+                                    </div>
+
+                                    <!-- Sort Indicators -->
+                                    <template x-if="col.sortable">
+                                        <div class="flex items-center shrink-0">
+                                            <!-- ASC -->
+                                            <span x-show="sortKey === col.id && sortDir === 'asc'" class="text-brand-green bg-brand-green/10 p-0.5 rounded">
+                                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
+                                                </svg>
+                                            </span>
+                                            <!-- DESC -->
+                                            <span x-show="sortKey === col.id && sortDir === 'desc'" class="text-brand-green bg-brand-green/10 p-0.5 rounded">
+                                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
+                                                </svg>
+                                            </span>
+                                            <!-- Inactive / Neutral -->
+                                            <span x-show="sortKey !== col.id" class="text-slate-300 group-hover:text-slate-500 transition-colors">
+                                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- Excel-Style Column Resizer Handle -->
+                                <div class="absolute right-0 top-0 bottom-0 w-2.5 cursor-col-resize select-none z-20 group/resizer flex items-center justify-center hover:bg-brand-gold/60 active:bg-brand-green transition-colors"
+                                     @mousedown.stop.prevent="startColResize(col, $event)"
+                                     @dblclick.stop.prevent="resetColumns()"
+                                     title="Arrastrar para ajustar ancho (Doble clic para restablecer)">
+                                    <div class="w-[2px] h-4 bg-slate-300 group-hover/resizer:bg-brand-green"></div>
+                                </div>
+                            </th>
+                        </template>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs text-slate-600">
                     <template x-for="proceso in paginatedCasos" :key="proceso.id || proceso.codigo">
                         <tr class="hover:bg-slate-50/50 transition-colors cursor-pointer" @click="openProcesoDetails(proceso)">
-                            <!-- Case Identifiers -->
-                            <td class="py-4 px-4 font-medium text-slate-800 space-y-1">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold"
-                                          :class="{
-                                            'bg-emerald-100 text-emerald-800': proceso.tipo.includes('Portal Fis'),
-                                            'bg-amber-100 text-brand-gold': proceso.tipo.includes('CUD'),
-                                            'bg-blue-100 text-blue-800': proceso.tipo.includes('CASO')
-                                          }" x-text="proceso.tipo"></span>
-                                    <span class="text-[10px] font-bold text-slate-400" x-text="proceso.ubicacion"></span>
-                                </div>
-                                <div class="text-xs font-bold text-brand-green" x-text="proceso.codigo"></div>
-                                <div class="text-[10px] text-slate-400" x-show="proceso.nurej && proceso.nurej !== 'N/A'" x-text="`NUREJ/IANUS: ${proceso.nurej}`"></div>
-                            </td>
-                            
-                            <!-- Denunciante -->
-                            <td class="py-4 px-4 font-semibold text-slate-800 uppercase" x-text="proceso.denunciante"></td>
-                            
-                            <!-- Denunciado -->
-                            <td class="py-4 px-4 font-bold text-slate-900 uppercase" x-text="proceso.denunciado"></td>
-                            
-                            <!-- Juzgado/Fiscalia -->
-                            <td class="py-4 px-4 space-y-0.5">
-                                <div class="font-bold text-slate-800 leading-tight" x-text="proceso.juzgado"></div>
-                                <div class="text-[10px] text-slate-400" x-show="proceso.sala" x-text="proceso.sala"></div>
-                                <div class="text-[10px] text-brand-gold font-medium" x-show="proceso.fiscal" x-text="`Autoridad: ${proceso.fiscal}`"></div>
-                            </td>
-                            
-                            <!-- Delito / Materia -->
-                            <td class="py-4 px-4 space-y-1">
-                                <div>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                                          :class="proceso.materia_badge || 'bg-slate-100 text-slate-700'"
-                                          x-text="proceso.materia"></span>
-                                </div>
-                                <div class="font-bold text-slate-800 uppercase text-xs leading-snug" x-text="proceso.delito"></div>
-                            </td>
-                            
-                            <!-- Estado del Proceso -->
-                            <td class="py-4 px-4 space-y-1.5">
-                                <div>
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
-                                          :class="proceso.estado_color || 'bg-slate-100 text-slate-700 border border-slate-200'"
-                                          x-text="proceso.estado_badge"></span>
-                                </div>
-                                <p class="text-xs text-slate-700 leading-relaxed font-medium line-clamp-3" x-text="proceso.estado"></p>
-                            </td>
+                            <template x-for="col in columns" :key="col.id">
+                                <td class="py-3.5 px-3.5 border-r border-slate-100 align-top overflow-hidden"
+                                    :class="col.align === 'right' ? 'text-right' : ''"
+                                    :style="'width:' + col.width + 'px; min-width:' + (col.minWidth || 60) + 'px;'">
+                                    
+                                    <!-- Case Identifiers -->
+                                    <div x-show="col.id === 'codigo'" class="font-medium text-slate-800 space-y-1">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold"
+                                                  :class="{
+                                                    'bg-emerald-100 text-emerald-800': proceso.tipo && proceso.tipo.includes('Portal Fis'),
+                                                    'bg-amber-100 text-brand-gold': proceso.tipo && proceso.tipo.includes('CUD'),
+                                                    'bg-blue-100 text-blue-800': proceso.tipo && proceso.tipo.includes('CASO')
+                                                  }" x-text="proceso.tipo"></span>
+                                            <span class="text-[10px] font-bold text-slate-400" x-text="proceso.ubicacion"></span>
+                                        </div>
+                                        <div class="text-xs font-bold text-brand-green truncate" x-text="proceso.codigo"></div>
+                                        <div class="text-[10px] text-slate-400 truncate" x-show="proceso.nurej && proceso.nurej !== 'N/A'" x-text="`NUREJ: ${proceso.nurej}`"></div>
+                                    </div>
+                                    
+                                    <!-- Denunciante -->
+                                    <div x-show="col.id === 'denunciante'" class="font-semibold text-slate-800 uppercase break-words" x-text="proceso.denunciante"></div>
+                                    
+                                    <!-- Denunciado -->
+                                    <div x-show="col.id === 'denunciado'" class="font-bold text-slate-900 uppercase break-words" x-text="proceso.denunciado"></div>
+                                    
+                                    <!-- Juzgado/Fiscalia -->
+                                    <div x-show="col.id === 'juzgado'" class="space-y-0.5">
+                                        <div class="font-bold text-slate-800 leading-tight" x-text="proceso.juzgado"></div>
+                                        <div class="text-[10px] text-slate-400" x-show="proceso.sala" x-text="proceso.sala"></div>
+                                        <div class="text-[10px] text-brand-gold font-medium" x-show="proceso.fiscal" x-text="`Autoridad: ${proceso.fiscal}`"></div>
+                                    </div>
+                                    
+                                    <!-- Delito / Materia -->
+                                    <div x-show="col.id === 'delito'" class="space-y-1">
+                                        <div>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                                                  :class="proceso.materia_badge || 'bg-slate-100 text-slate-700'"
+                                                  x-text="proceso.materia"></span>
+                                        </div>
+                                        <div class="font-bold text-slate-800 uppercase text-xs leading-snug" x-text="proceso.delito"></div>
+                                    </div>
+                                    
+                                    <!-- Estado del Proceso -->
+                                    <div x-show="col.id === 'estado'" class="space-y-1.5">
+                                        <div>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                                                  :class="proceso.estado_color || 'bg-slate-100 text-slate-700 border border-slate-200'"
+                                                  x-text="proceso.estado_badge"></span>
+                                        </div>
+                                        <p class="text-xs text-slate-700 leading-relaxed font-medium line-clamp-3" x-text="proceso.estado"></p>
+                                    </div>
 
-                            <!-- Acción Directa: Editar -->
-                            <td class="py-4 px-4 text-right" @click.stop>
-                                <button type="button" 
-                                        @click="openEditProcesoModal(proceso)" 
-                                        title="Editar Expediente"
-                                        class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-brand-green hover:text-white text-slate-600 transition-all shadow-2xs cursor-pointer">
-                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </td>
+                                    <!-- Acción Directa: Editar -->
+                                    <div x-show="col.id === 'accion'" class="text-right" @click.stop>
+                                        <button type="button" 
+                                                @click="openEditProcesoModal(proceso)" 
+                                                title="Editar Expediente"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-brand-green hover:text-white text-slate-600 transition-all shadow-2xs cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                </td>
+                            </template>
                         </tr>
                     </template>
                     <tr x-show="filteredCasos.length === 0">
-                        <td colspan="7" class="py-16 text-center text-slate-400 font-medium bg-slate-50/20">
+                        <td :colspan="columns.length" class="py-16 text-center text-slate-400 font-medium bg-slate-50/20">
                             <i data-lucide="folder-search" class="w-12 h-12 mx-auto mb-2 text-slate-300"></i>
-                            Ningún proceso coincide con los criterios de filtrado seleccionados.
+                            <div class="mt-2 text-slate-400">Ningún proceso coincide con los criterios de filtrado seleccionados.</div>
                         </td>
                     </tr>
                 </tbody>
@@ -1944,6 +2014,102 @@
             </div>
         </div>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL POPUP: CONFIGURACIÓN Y ORDEN DE COLUMNAS                           -->
+    <!-- ========================================================================= -->
+    <div class="fixed inset-0 z-50 overflow-y-auto"
+         x-show="columnsConfigModalOpen" 
+         style="display: none;"
+         @keydown.escape.window="columnsConfigModalOpen = false"
+         x-cloak>
+
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             @click="columnsConfigModalOpen = false"
+             x-show="columnsConfigModalOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"></div>
+
+        <!-- Modal Dialog -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all"
+                 x-show="columnsConfigModalOpen"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Columnas de la Tabla</h3>
+                            <p class="text-[11px] text-slate-500 font-normal">Reordene las columnas y restablezca anchos</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="columnsConfigModalOpen = false" class="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-5 space-y-3 max-h-[60vh] overflow-y-auto">
+                    <p class="text-xs text-slate-500">
+                        Puede arrastrar los encabezados directamente en la tabla o usar las flechas para ordenar:
+                    </p>
+                    <div class="space-y-1.5">
+                        <template x-for="(col, idx) in columns" :key="col.id">
+                            <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center shrink-0" x-text="idx + 1"></span>
+                                    <span class="text-xs font-bold text-slate-700 truncate" x-text="col.label"></span>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button type="button" 
+                                            @click="moveColumn(idx, -1)" 
+                                            :disabled="idx === 0"
+                                            title="Subir"
+                                            class="w-7 h-7 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed">
+                                        <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <button type="button" 
+                                            @click="moveColumn(idx, 1)" 
+                                            :disabled="idx === columns.length - 1"
+                                            title="Bajar"
+                                            class="w-7 h-7 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed">
+                                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between gap-2 px-5 py-3.5 bg-slate-50 border-t border-slate-100">
+                    <button type="button" 
+                            @click="resetColumns()" 
+                            class="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Restablecer</span>
+                    </button>
+                    <button type="button" @click="columnsConfigModalOpen = false" class="px-4 py-2 text-xs font-semibold text-white bg-brand-green hover:bg-brand-green-hover rounded-xl transition-colors cursor-pointer">
+                        Listo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -1968,6 +2134,40 @@
             telegramNotify: localStorage.getItem('telegramNotify') === 'true',
             telegramToken: localStorage.getItem('telegramToken') || '',
             telegramChatId: localStorage.getItem('telegramChatId') || '',
+
+            // Column Management, Sort, Resize & Drag-and-Drop
+            sortKey: '',
+            sortDir: 'asc', // 'asc' | 'desc'
+            isResizing: false,
+            resizingCol: null,
+            startX: 0,
+            startWidth: 0,
+            hasUserResized: false,
+            draggedColIndex: null,
+            dragOverColIndex: null,
+
+            columns: [
+                { id: 'codigo', label: 'Nro. de Caso / CUD / NUREJ', minWidth: 160, width: 200, sortable: true },
+                { id: 'denunciante', label: 'Denunciante', minWidth: 120, width: 150, sortable: true },
+                { id: 'denunciado', label: 'Denunciado', minWidth: 120, width: 150, sortable: true },
+                { id: 'juzgado', label: 'Juzgado / Fiscalía', minWidth: 150, width: 200, sortable: true },
+                { id: 'delito', label: 'Delito / Acción', minWidth: 130, width: 160, sortable: true },
+                { id: 'estado', label: 'Estado del Proceso', minWidth: 180, width: 230, sortable: true },
+                { id: 'accion', label: 'Acción', minWidth: 70, width: 80, sortable: false, align: 'right' }
+            ],
+            defaultColumns: [
+                { id: 'codigo', label: 'Nro. de Caso / CUD / NUREJ', minWidth: 160, width: 200, sortable: true },
+                { id: 'denunciante', label: 'Denunciante', minWidth: 120, width: 150, sortable: true },
+                { id: 'denunciado', label: 'Denunciado', minWidth: 120, width: 150, sortable: true },
+                { id: 'juzgado', label: 'Juzgado / Fiscalía', minWidth: 150, width: 200, sortable: true },
+                { id: 'delito', label: 'Delito / Acción', minWidth: 130, width: 160, sortable: true },
+                { id: 'estado', label: 'Estado del Proceso', minWidth: 180, width: 230, sortable: true },
+                { id: 'accion', label: 'Acción', minWidth: 70, width: 80, sortable: false, align: 'right' }
+            ],
+
+            get totalTableWidth() {
+                return this.columns.reduce((sum, col) => sum + (Number(col.width) || 100), 0);
+            },
             
             // Statistics derived dynamically
             get stats() {
@@ -2046,7 +2246,7 @@
             editProceso: {},
 
             get filteredCasos() {
-                return this.casos.filter(caso => {
+                let result = this.casos.filter(caso => {
                     const q = this.searchQuery ? this.searchQuery.toLowerCase().trim() : '';
                     const matchesSearch = !q || 
                         (caso.codigo && String(caso.codigo).toLowerCase().includes(q)) ||
@@ -2063,6 +2263,40 @@
 
                     return matchesSearch && matchesMateria && matchesEstado && matchesAbogado;
                 });
+
+                if (this.sortKey) {
+                    const key = this.sortKey;
+                    const dir = this.sortDir === 'desc' ? -1 : 1;
+                    result.sort((a, b) => {
+                        let valA = '';
+                        let valB = '';
+                        if (key === 'codigo') {
+                            valA = a.codigo || a.cud || a.nurej || '';
+                            valB = b.codigo || b.cud || b.nurej || '';
+                        } else if (key === 'denunciante') {
+                            valA = a.denunciante || '';
+                            valB = b.denunciante || '';
+                        } else if (key === 'denunciado') {
+                            valA = a.denunciado || '';
+                            valB = b.denunciado || '';
+                        } else if (key === 'juzgado') {
+                            valA = a.juzgado || '';
+                            valB = b.juzgado || '';
+                        } else if (key === 'delito') {
+                            valA = a.delito || a.materia || '';
+                            valB = b.delito || b.materia || '';
+                        } else if (key === 'estado') {
+                            valA = a.estado_badge || a.estado || '';
+                            valB = b.estado_badge || b.estado || '';
+                        } else {
+                            valA = a[key] || '';
+                            valB = b[key] || '';
+                        }
+                        return String(valA).localeCompare(String(valB), 'es', { numeric: true, sensitivity: 'base' }) * dir;
+                    });
+                }
+
+                return result;
             },
 
             // Paginación
@@ -2121,12 +2355,163 @@
                 }
             },
 
+            toggleSort(colId) {
+                const col = this.columns.find(c => c.id === colId);
+                if (!col || !col.sortable) return;
+                
+                if (this.sortKey === colId) {
+                    if (this.sortDir === 'asc') {
+                        this.sortDir = 'desc';
+                    } else if (this.sortDir === 'desc') {
+                        this.sortKey = '';
+                        this.sortDir = 'asc';
+                    }
+                } else {
+                    this.sortKey = colId;
+                    this.sortDir = 'asc';
+                }
+                this.currentPage = 1;
+                this.$nextTick(() => {
+                    if (window.lucide) window.lucide.createIcons();
+                });
+            },
+
+            initColumnWidths() {
+                const container = document.getElementById('procesosTableContainer');
+                if (!container) return;
+                const totalW = container.clientWidth;
+                if (totalW < 300) return;
+                
+                const ratios = {
+                    codigo: 0.17,
+                    denunciante: 0.13,
+                    denunciado: 0.13,
+                    juzgado: 0.17,
+                    delito: 0.14,
+                    estado: 0.20,
+                    accion: 0.06
+                };
+                
+                let allocated = 0;
+                this.columns.forEach((c, idx) => {
+                    if (idx === this.columns.length - 1) {
+                        c.width = Math.max(c.minWidth || 60, totalW - allocated);
+                    } else {
+                        const ratio = ratios[c.id] || (1 / this.columns.length);
+                        const w = Math.max(c.minWidth || 60, Math.floor(totalW * ratio));
+                        c.width = w;
+                        allocated += w;
+                    }
+                });
+            },
+
+            resetColumns() {
+                this.columns = JSON.parse(JSON.stringify(this.defaultColumns));
+                this.hasUserResized = false;
+                this.initColumnWidths();
+                this.columnsConfigModalOpen = false;
+                this.$nextTick(() => {
+                    if (window.lucide) window.lucide.createIcons();
+                });
+            },
+
+            startColResize(col, event) {
+                this.hasUserResized = true;
+                this.isResizing = true;
+                this.resizingCol = col;
+                this.startX = event.clientX;
+                this.startWidth = col.width || 120;
+                
+                const onMouseMove = (e) => {
+                    if (!this.isResizing || !this.resizingCol) return;
+                    const delta = e.clientX - this.startX;
+                    const newWidth = Math.max(this.resizingCol.minWidth || 60, this.startWidth + delta);
+                    this.resizingCol.width = newWidth;
+                };
+                
+                const onMouseUp = () => {
+                    this.isResizing = false;
+                    this.resizingCol = null;
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                };
+                
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            },
+
+            onColDragStart(event, index) {
+                if (this.isResizing) {
+                    event.preventDefault();
+                    return;
+                }
+                this.draggedColIndex = index;
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', String(index));
+            },
+
+            onColDragOver(event, index) {
+                if (this.draggedColIndex === null) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+                if (this.dragOverColIndex !== index) {
+                    this.dragOverColIndex = index;
+                }
+            },
+
+            onColDragLeave(event, index) {
+                // Smooth UX
+            },
+
+            onColDrop(event, targetIndex) {
+                event.preventDefault();
+                if (this.draggedColIndex !== null && this.draggedColIndex !== targetIndex) {
+                    const movedItem = this.columns.splice(this.draggedColIndex, 1)[0];
+                    this.columns.splice(targetIndex, 0, movedItem);
+                }
+                this.draggedColIndex = null;
+                this.dragOverColIndex = null;
+                this.$nextTick(() => {
+                    if (window.lucide) window.lucide.createIcons();
+                });
+            },
+
+            onColDragEnd(event) {
+                this.draggedColIndex = null;
+                this.dragOverColIndex = null;
+            },
+
+            moveColumn(index, direction) {
+                const target = index + direction;
+                if (target < 0 || target >= this.columns.length) return;
+                const moved = this.columns.splice(index, 1)[0];
+                this.columns.splice(target, 0, moved);
+                this.$nextTick(() => {
+                    if (window.lucide) window.lucide.createIcons();
+                });
+            },
+
             init() {
                 this.$watch('searchQuery', () => { this.currentPage = 1; });
                 this.$watch('selectedMateria', () => { this.currentPage = 1; });
                 this.$watch('selectedEstado', () => { this.currentPage = 1; });
                 this.$watch('selectedAbogado', () => { this.currentPage = 1; });
                 this.$watch('perPage', () => { this.currentPage = 1; });
+
+                this.$nextTick(() => {
+                    this.initColumnWidths();
+                    if (window.lucide) window.lucide.createIcons();
+                });
+
+                window.addEventListener('resize', () => {
+                    if (!this.hasUserResized) {
+                        this.initColumnWidths();
+                    }
+                });
             },
 
             openProcesoDetails(proceso) {
