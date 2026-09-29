@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Sillerico & Abogados - Sistema')</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <!-- Tailwind v4 via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Alpine.js CDN for interactive prototype -->
@@ -511,6 +516,16 @@
                                 <i data-lucide="users" class="w-3 h-3"></i>
                                 Gestión Equipo
                             </a>
+
+                        <div class="p-2 border-t border-slate-100 bg-white">
+                            <form action="{{ route('logout') }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer">
+                                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                                    Cerrar Sesión Segura
+                                </button>
+                            </form>
+                        </div>
                             <a href="{{ url('/auditoria') }}" class="text-brand-gold hover:underline flex items-center gap-1">
                                 <i data-lucide="history" class="w-3 h-3"></i>
                                 Ver Trazabilidad
