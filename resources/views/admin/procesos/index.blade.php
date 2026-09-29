@@ -10,9 +10,19 @@
         color: #F7E8A7 !important;
         font-weight: 700 !important;
         transition: all 0.2s ease-in-out !important;
-    }
     .btn-primary:hover {
         background-color: var(--color-brand-green-hover, #0c3d2f) !important;
+    }
+    .col-resizer {
+        cursor: col-resize !important;
+        cursor: ew-resize !important;
+        user-select: none !important;
+    }
+    .col-resizer:hover .col-resizer-line,
+    .col-resizer-active .col-resizer-line {
+        background-color: #c5a059 !important;
+        width: 3px !important;
+        box-shadow: 0 0 6px rgba(197, 160, 89, 0.4) !important;
     }
 </style>
 <div x-data="procesosData()" @open-new-case-modal.window="openCreateProceso()" class="flex-1 min-h-0 flex flex-col w-full h-full animate-fade-in overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden !important;">
@@ -122,14 +132,14 @@
                                 </div>
 
                                 <!-- Excel-Style Column Resizer Handle (Between colIndex and colIndex + 1) -->
-                                <template x-if="colIndex < columns.length - 1">
-                                    <div class="absolute -right-1.5 top-0 bottom-0 w-3 cursor-col-resize select-none z-20 group/resizer flex items-center justify-center"
-                                         @mousedown.stop.prevent="startColResize(colIndex, $event)"
-                                         title="Arrastrar para ajustar ancho">
-                                        <div class="w-[3px] h-full transition-colors rounded-full"
-                                             :class="isResizing && resizingColIndex === colIndex ? 'bg-brand-gold' : 'bg-transparent group-hover/resizer:bg-brand-gold/70'"></div>
-                                    </div>
-                                </template>
+                                <div x-show="colIndex < columns.length - 1"
+                                     class="col-resizer absolute top-0 bottom-0 flex items-center justify-center select-none"
+                                     :class="{ 'col-resizer-active': isResizing && resizingColIndex === colIndex }"
+                                     style="right: -8px; width: 16px; z-index: 40; cursor: col-resize !important; cursor: ew-resize !important;"
+                                     @mousedown.stop.prevent="startColResize(colIndex, $event)"
+                                     title="Arrastrar para ajustar ancho">
+                                    <div class="col-resizer-line w-[2px] h-full bg-slate-300/80 transition-all pointer-events-none"></div>
+                                </div>
                             </th>
                         </template>
                     </tr>
@@ -1077,51 +1087,97 @@
         <div class="flex-1 min-h-0 overflow-y-auto p-6 md:p-8 space-y-6" style="flex: 1 1 0px !important; min-height: 0 !important; overflow-y: auto !important;">
             <form @submit.prevent="submitForm()" class="max-w-6xl mx-auto space-y-6">
 
-                <!-- 1. IDENTIFICACIÓN Y TIPO DE REGISTRO -->
+                <!-- 1. IDENTIFICACIÓN DEL PROCESO -->
                 <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 md:p-6 space-y-5">
                     <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
                         <div class="flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">1</span>
-                            <h3 class="text-xs font-bold text-brand-green uppercase tracking-wider">Identificación y Clasificación de la Causa</h3>
+                            <h3 class="text-xs font-bold text-brand-green uppercase tracking-wider">Identificación del Proceso</h3>
                         </div>
-                        <span class="text-[11px] font-semibold text-slate-600">Datos judiciales y fiscales</span>
+                        <span class="text-[11px] font-semibold text-slate-500">Expediente, códigos judiciales y fiscalía</span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Tipo de Registro -->
+                        <!-- Código Interno del Expediente -->
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                                Tipo de Identificador <span class="text-rose-500">*</span>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Código Interno <span class="text-rose-500">*</span></span>
+                                <span class="text-[10px] text-brand-gold font-semibold lowercase">control firma</span>
                             </label>
-                            <select x-model="newProceso.tipo" 
-                                    class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 font-semibold shadow-2xs">
-                                <option value="CUD">CUD (Fiscalía / Caso Penal)</option>
-                                <option value="Portal Fis">Portal Fiscalía (IANUS)</option>
-                                <option value="NUREJ">NUREJ (Tribunales / Juzgados)</option>
-                                <option value="CASO">Caso Interno / Extrajudicial</option>
-                            </select>
+                            <input type="text" x-model="newProceso.codigo_interno" required 
+                                   placeholder="Ej: EXP-2026-0083"
+                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-brand-green font-black tracking-wide shadow-2xs">
                         </div>
 
-                        <!-- Número de Caso / CUD / Código Principal -->
+                        <!-- CUD (Fiscalía / Justicia Libre) -->
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                                Nro. de Caso / CUD / Código <span class="text-rose-500">*</span>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>CUD (Fiscalía)</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Justicia Libre</span>
                             </label>
-                            <input type="text" x-model="newProceso.codigo" required 
-                                   placeholder="Ej: LPZ1910962 o 2011020120015"
-                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-800 font-bold shadow-2xs">
+                            <input type="text" x-model="newProceso.cud" 
+                                   placeholder="Ej: 201102012002272"
+                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-800 font-semibold shadow-2xs">
                         </div>
 
-                        <!-- NUREJ / IANUS (Opcional) -->
+                        <!-- NUREJ (Órgano Judicial / SIREJ) -->
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                                NUREJ / IANUS Complementario
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>NUREJ (Judicial)</span>
+                                <span class="text-[10px] text-slate-400 font-normal">SIREJ / Tribunal</span>
                             </label>
                             <input type="text" x-model="newProceso.nurej" 
-                                   placeholder="Ej: 20184712 o N/A"
+                                   placeholder="Ej: 20269294"
+                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-800 font-semibold shadow-2xs">
+                        </div>
+
+                        <!-- Código IANUS (Histórico) -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Código IANUS</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Histórico / Casación</span>
+                            </label>
+                            <input type="text" x-model="newProceso.ianus" 
+                                   placeholder="Ej: 200905208"
                                    class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 shadow-2xs">
                         </div>
 
+                        <!-- Código Caso / Policial -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Código Caso / Policial</span>
+                                <span class="text-[10px] text-slate-400 font-normal">División / FELCC</span>
+                            </label>
+                            <input type="text" x-model="newProceso.codigo_caso" 
+                                   placeholder="Ej: LPZ19 10962 o ZSR170 1240"
+                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 shadow-2xs">
+                        </div>
+
+                        <!-- Portal Fiscalía (Toggle / Checkbox) -->
+                        <div class="flex flex-col justify-end">
+                            <label class="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-brand-gold/60 transition-colors shadow-2xs">
+                                <input type="checkbox" x-model="newProceso.portal_fiscalia" 
+                                       class="w-4 h-4 rounded text-brand-green focus:ring-brand-gold border-slate-300">
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-800 block">Portal Fiscalía (Justicia Libre)</span>
+                                    <span class="text-[10px] text-slate-500">¿Causa habilitada para consulta digital?</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. CLASIFICACIÓN DE LA CAUSA -->
+                <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 md:p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">2</span>
+                            <h3 class="text-xs font-bold text-brand-green uppercase tracking-wider">Clasificación de la Causa</h3>
+                        </div>
+                        <span class="text-[11px] font-semibold text-slate-500">Materia, jurisdicción y pretensión jurídica</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Materia -->
                         <div>
                             <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
@@ -1139,12 +1195,12 @@
                         <!-- Delito / Acción Jurídica Principal -->
                         <div>
                             <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                                Delito / Acción Principal <span class="text-rose-500">*</span>
+                                Delito / Pretensión Principal <span class="text-rose-500">*</span>
                             </label>
                             <input type="text" x-model="newProceso.delito" required 
                                    list="articulos-datalist"
                                    placeholder="Ej: Estafa, Violencia Familiar, Cobro de Dinero..."
-                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-800 shadow-2xs">
+                                   class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-800 shadow-2xs font-semibold">
                             <datalist id="articulos-datalist">
                                 <template x-for="art in articulosList" :key="art.id">
                                     <option :value="art.epigrafe_delito" x-text="art.numero_articulo + ' - ' + art.epigrafe_delito"></option>
@@ -1167,11 +1223,11 @@
                     </div>
                 </div>
 
-                <!-- 2. SUJETOS PROCESALES (PARTES) -->
+                <!-- 3. SUJETOS PROCESALES (PARTES) -->
                 <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 md:p-6 space-y-5">
                     <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">2</span>
+                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">3</span>
                             <h3 class="text-xs font-bold text-brand-green uppercase tracking-wider">Sujetos Procesales / Partes del Caso</h3>
                         </div>
                         <span class="text-[11px] font-semibold text-slate-600">Representación y contraparte</span>
@@ -1302,11 +1358,11 @@
                     </div>
                 </div>
 
-                <!-- 3. RADICATORIA Y AUTORIDADES -->
+                <!-- 4. RADICATORIA Y AUTORIDADES -->
                 <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 md:p-6 space-y-5">
                     <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">3</span>
+                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">4</span>
                             <h3 class="text-xs font-bold text-brand-green uppercase tracking-wider">Radicatoria, Juzgado y Autoridades</h3>
                         </div>
                         <span class="text-[11px] font-semibold text-slate-600">Tribunal o Fiscalía</span>
@@ -1382,11 +1438,11 @@
                     </div>
                 </div>
 
-                <!-- 4. GESTIÓN INTERNA Y ESTADO -->
+                <!-- 5. GESTIÓN INTERNA Y ESTADO -->
                 <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 md:p-6 space-y-5">
                     <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">4</span>
+                            <span class="w-6 h-6 rounded-lg bg-brand-green text-white flex items-center justify-center text-xs font-black">5</span>
                             <h3 class="text-xs font-bold text-brand-green uppercase tracking-wider">Gestión Interna y Estado del Proceso</h3>
                         </div>
                         <span class="text-[11px] font-semibold text-slate-600">Asignación en el bufete</span>
@@ -1532,19 +1588,32 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nro. / Código *</label>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Código Interno *</label>
                                 <input type="text" x-model="editProceso.codigo" required
                                        class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl font-bold text-brand-green focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tipo de Registro</label>
-                                <select x-model="editProceso.tipo"
-                                        class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
-                                    <option value="Portal Fis">Portal Fis</option>
-                                    <option value="CUD">CUD</option>
-                                    <option value="CASO">CASO</option>
-                                    <option value="EXPEDIENTE">EXPEDIENTE</option>
-                                </select>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">CUD (Fiscalía)</label>
+                                <input type="text" x-model="editProceso.cud" placeholder="Código Único de Causa..."
+                                       class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">NUREJ (Judicial)</label>
+                                <input type="text" x-model="editProceso.nurej" placeholder="NUREJ del juzgado..."
+                                       class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Código IANUS</label>
+                                <input type="text" x-model="editProceso.ianus" placeholder="Histórico..."
+                                       class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Código Caso / Policial</label>
+                                <input type="text" x-model="editProceso.codigo_caso" placeholder="División / FELCC..."
+                                       class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jurisdicción</label>
@@ -1555,18 +1624,11 @@
                                     </template>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">CUD / IANUS</label>
-                                <input type="text" x-model="editProceso.cud" placeholder="Código Único de Causa..."
-                                       class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">NUREJ</label>
-                                <input type="text" x-model="editProceso.nurej" placeholder="NUREJ del juzgado..."
-                                       class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl text-slate-700 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold">
+                            <div class="flex flex-col justify-end">
+                                <label class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-gold/60 transition-colors">
+                                    <input type="checkbox" x-model="editProceso.portal_fiscalia" class="w-4 h-4 rounded text-brand-green focus:ring-brand-gold border-slate-300">
+                                    <span class="text-[10px] font-bold text-slate-700">Portal Fiscalía</span>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -2190,9 +2252,13 @@
             },
 
             newProceso: {
-                tipo: 'CUD',
-                codigo: '',
+                codigo_interno: '{{ $nextCodigoInterno ?? "" }}',
+                cud: '',
                 nurej: '',
+                ianus: '',
+                codigo_caso: '',
+                portal_fiscalia: false,
+
                 materia_id: {{ count($materias) ? $materias[0]->id : 1 }},
                 delito: '',
                 jurisdiccion_id: {{ count($jurisdicciones) ? $jurisdicciones[0]->id : 1 }},
@@ -2401,34 +2467,64 @@
                 this.isResizing = true;
                 this.resizingColIndex = colIndex;
                 this.startX = event.clientX;
-                this.startPctLeft = Number(this.columns[colIndex].width);
-                this.startPctRight = Number(this.columns[colIndex + 1].width);
+
+                // Obtain the direct <th> DOM elements for this column and adjacent column
+                const thead = event.currentTarget.closest('thead');
+                const ths = thead ? thead.querySelectorAll('th') : [];
+                const thLeft = ths[colIndex];
+                const thRight = ths[colIndex + 1];
+
+                if (!thLeft || !thRight) {
+                    this.isResizing = false;
+                    this.resizingColIndex = null;
+                    return;
+                }
+
+                const startWidthLeft = thLeft.getBoundingClientRect().width;
+                const startWidthRight = thRight.getBoundingClientRect().width;
+                const totalPairWidth = startWidthLeft + startWidthRight;
 
                 const container = document.getElementById('procesosTableContainer');
-                const tableWidth = container ? container.clientWidth : 1000;
-                this.tablePixelWidth = tableWidth > 0 ? tableWidth : 1000;
+                const tableWidth = container ? container.clientWidth : (thead.getBoundingClientRect().width || 1000);
+
+                const minPixelWidth = 50; // Minimum 50px per column so it never collapses
 
                 const onMouseMove = (e) => {
                     if (!this.isResizing) return;
                     const deltaX = e.clientX - this.startX;
-                    const deltaPct = (deltaX / this.tablePixelWidth) * 100;
 
-                    const totalPairPct = this.startPctLeft + this.startPctRight;
-                    const minPct = 4; // minimum width percentage
+                    let newWidthLeft = startWidthLeft + deltaX;
+                    let newWidthRight = startWidthRight - deltaX;
 
-                    let newLeft = this.startPctLeft + deltaPct;
-                    let newRight = this.startPctRight - deltaPct;
-
-                    if (newLeft < minPct) {
-                        newLeft = minPct;
-                        newRight = totalPairPct - minPct;
-                    } else if (newRight < minPct) {
-                        newRight = minPct;
-                        newLeft = totalPairPct - minPct;
+                    if (newWidthLeft < minPixelWidth) {
+                        newWidthLeft = minPixelWidth;
+                        newWidthRight = totalPairWidth - minPixelWidth;
+                    } else if (newWidthRight < minPixelWidth) {
+                        newWidthRight = minPixelWidth;
+                        newWidthLeft = totalPairWidth - minPixelWidth;
                     }
 
-                    this.columns[colIndex].width = Math.round(newLeft * 10) / 10;
-                    this.columns[colIndex + 1].width = Math.round(newRight * 10) / 10;
+                    const pctLeft = (newWidthLeft / tableWidth) * 100;
+                    const pctRight = (newWidthRight / tableWidth) * 100;
+
+                    // Direct DOM manipulation for instantaneous 60fps response
+                    thLeft.style.width = pctLeft + '%';
+                    thRight.style.width = pctRight + '%';
+
+                    // Update corresponding cells in table body
+                    const tbody = thead.parentElement ? thead.parentElement.querySelector('tbody') : null;
+                    if (tbody) {
+                        const rows = tbody.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const tds = row.querySelectorAll('td');
+                            if (tds[colIndex]) tds[colIndex].style.width = pctLeft + '%';
+                            if (tds[colIndex + 1]) tds[colIndex + 1].style.width = pctRight + '%';
+                        });
+                    }
+
+                    // Synchronize Alpine state
+                    this.columns[colIndex].width = Math.round(pctLeft * 10) / 10;
+                    this.columns[colIndex + 1].width = Math.round(pctRight * 10) / 10;
                 };
 
                 const onMouseUp = () => {
@@ -2583,9 +2679,13 @@
 
             resetNewProcesoForm() {
                 this.newProceso = {
-                    tipo: 'CUD',
-                    codigo: '',
+                    codigo_interno: '{{ $nextCodigoInterno ?? "" }}',
+                    cud: '',
                     nurej: '',
+                    ianus: '',
+                    codigo_caso: '',
+                    portal_fiscalia: false,
+
                     materia_id: this.materiasList && this.materiasList.length ? this.materiasList[0].id : 1,
                     delito: '',
                     jurisdiccion_id: this.jurisdiccionesList && this.jurisdiccionesList.length ? this.jurisdiccionesList[0].id : 1,
@@ -2643,12 +2743,13 @@
                 this.editProceso = {
                     id: p.id,
                     codigo: p.codigo || '',
-                    codigo_interno: p.codigo || '',
+                    codigo_interno: p.codigo_interno || p.codigo || '',
                     tipo: p.tipo || 'Portal Fis',
                     cud: p.cud || '',
-                    nurej: (p.nurej && p.nurej !== 'N/A') ? p.nurej : '',
+                    nurej: (p.nurej_raw || (p.nurej && p.nurej !== 'N/A' ? p.nurej : '')),
+                    ianus: p.ianus || '',
                     codigo_caso: p.codigo_caso || '',
-                    portal_fiscalia: p.tipo ? p.tipo.includes('Portal') : false,
+                    portal_fiscalia: typeof p.portal_fiscalia !== 'undefined' ? !!p.portal_fiscalia : (p.tipo ? p.tipo.includes('Portal') : false),
                     materia_id: p.materia_id || (this.materiasList[0] ? this.materiasList[0].id : null),
                     materia: p.materia || '',
                     jurisdiccion_id: p.jurisdiccion_id || (this.jurisdiccionesList[0] ? this.jurisdiccionesList[0].id : null),
@@ -2759,7 +2860,7 @@
             },
             
             async submitForm() {
-                if (!this.newProceso.codigo || !this.newProceso.denunciante || !this.newProceso.denunciado || !this.newProceso.juzgado || !this.newProceso.delito) {
+                if (!this.newProceso.codigo_interno || !this.newProceso.denunciante || !this.newProceso.denunciado || !this.newProceso.juzgado || !this.newProceso.delito) {
                     this.showToast('Por favor complete los campos obligatorios marcados con (*)');
                     return;
                 }
@@ -2771,13 +2872,13 @@
                     const abgObj = this.equipo ? this.equipo.find(e => e.id == this.newProceso.abogado_id) : null;
 
                     const payload = {
-                        codigo_interno: this.newProceso.codigo,
-                        codigo: this.newProceso.codigo,
-                        tipo: this.newProceso.tipo,
-                        cud: this.newProceso.tipo === 'CUD' ? this.newProceso.codigo : null,
-                        codigo_caso: this.newProceso.tipo === 'CASO' ? this.newProceso.codigo : null,
+                        codigo_interno: this.newProceso.codigo_interno,
+                        codigo: this.newProceso.codigo_interno,
+                        cud: this.newProceso.cud || null,
                         nurej: (this.newProceso.nurej && this.newProceso.nurej !== 'N/A') ? this.newProceso.nurej : null,
-                        portal_fiscalia: this.newProceso.tipo === 'Portal Fis',
+                        ianus: this.newProceso.ianus || null,
+                        codigo_caso: this.newProceso.codigo_caso || null,
+                        portal_fiscalia: !!this.newProceso.portal_fiscalia,
                         
                         materia_id: this.newProceso.materia_id,
                         materia: matObj ? matObj.nombre : null,
