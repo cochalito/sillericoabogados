@@ -7,63 +7,35 @@
 <div x-data="procesosData()" @open-new-case-modal.window="openCreateProceso()" class="flex-1 min-h-0 flex flex-col w-full h-full animate-fade-in overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden !important;">
     <!-- Table and Filter Area -->
     <div x-show="currentView === 'list'" class="bg-white rounded-2xl border border-slate-100 shadow-xs flex-1 min-h-0 flex flex-col w-full h-full overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden !important;">
-        <!-- Advanced Filters & Action Header -->
-        <div class="border-b border-slate-100 space-y-4 shrink-0" style="padding: 18px !important; flex-shrink: 0;">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <!-- Action Button in Header -->
-                <button @click="openCreateProceso()" 
-                        class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01] shrink-0 cursor-pointer">
-                    <i data-lucide="folder-plus" class="w-4 h-4"></i>
-                    Registrar Nuevo Proceso
-                </button>
-
-                <!-- Tab Filters by Estado -->
-                <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-[10px] font-bold text-slate-500 overflow-x-auto">
-                    <button class="px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap"
-                            :class="selectedEstado === 'Todos' ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
-                            @click="selectedEstado = 'Todos'">Todos</button>
-                    <template x-for="est in estadosList" :key="est.id">
-                        <button class="px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap"
-                                :class="selectedEstado === est.nombre ? 'bg-white text-brand-green shadow-xs' : 'hover:text-slate-700'"
-                                @click="selectedEstado = est.nombre"
-                                x-text="est.nombre"></button>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Parametric Filters: Materia, Abogado, Search -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <!-- 1. Materia Filter -->
-                <div>
-                    <select x-model="selectedMateria" 
-                            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 font-medium">
-                        <option value="Todas">Todas las materias</option>
-                        <template x-for="mat in materiasList" :key="mat.id">
-                            <option :value="mat.nombre" x-text="mat.nombre"></option>
-                        </template>
-                    </select>
+        <!-- Encabezado de Acciones y Herramientas -->
+        <div class="border-b border-slate-100 shrink-0" style="padding: 12px 18px !important; flex-shrink: 0;">
+            <div class="flex items-center justify-between gap-3">
+                <!-- Alineado a la izquierda: Botón de configuración de columnas (icono de ecualizador) -->
+                <div class="flex items-center gap-2">
+                    <button type="button" 
+                            @click="columnsConfigModalOpen = true"
+                            title="Configuración de columnas"
+                            class="inline-flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    </button>
                 </div>
 
-                <!-- 2. Abogado Filter -->
-                <div>
-                    <select x-model="selectedAbogado" 
-                            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700 font-medium">
-                        <option value="Todos">Todos los abogados</option>
-                        <template x-for="m in equipo" :key="m.nombre">
-                            <option :value="m.nombre" x-text="m.nombre"></option>
-                        </template>
-                    </select>
-                </div>
+                <!-- Alineado a la derecha: Botón filtro (solo icono) + Botón Nuevo proceso -->
+                <div class="flex items-center gap-2.5">
+                    <!-- Botón filtro (solo icono) -->
+                    <button type="button" 
+                            @click="openFilterModal()"
+                            title="Filtrar por columna"
+                            class="inline-flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                    </button>
 
-                <!-- 3. Search Query Input -->
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-                    </div>
-                    <input type="text" 
-                           x-model="searchQuery" 
-                           placeholder="Buscar por caso, CUD, NUREJ, partes, juzgado..." 
-                           class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-slate-700">
+                    <!-- Botón Nuevo proceso -->
+                    <button @click="openCreateProceso()" 
+                            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-brand-green text-white hover:bg-brand-green-hover text-xs font-semibold rounded-xl shadow-md shadow-brand-green/10 transition-all hover:scale-[1.01] shrink-0 cursor-pointer">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        Nuevo proceso
+                    </button>
                 </div>
             </div>
         </div>
@@ -1894,6 +1866,72 @@
 
             </div>
         </div>
+    <!-- ========================================================================= -->
+    <!-- MODAL POPUP: FILTROS POR COLUMNA                                          -->
+    <!-- ========================================================================= -->
+    <div class="fixed inset-0 z-50 overflow-y-auto"
+         x-show="filterModalOpen" 
+         style="display: none;"
+         @keydown.escape.window="filterModalOpen = false"
+         x-cloak>
+
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             @click="filterModalOpen = false"
+             x-show="filterModalOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"></div>
+
+        <!-- Modal Dialog -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all"
+                 x-show="filterModalOpen"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center">
+                            <i data-lucide="filter" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Filtro de Procesos</h3>
+                            <p class="text-[11px] text-slate-500 font-normal">Filtre las causas por cada columna</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="filterModalOpen = false" class="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Body Placeholder -->
+                <div class="p-6 space-y-4">
+                    <div class="text-center py-6 text-slate-400 space-y-2">
+                        <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                            <i data-lucide="filter" class="w-6 h-6 text-brand-gold"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-700 uppercase">Filtros por Columna</h4>
+                        <p class="text-[11px] text-slate-500 max-w-xs mx-auto">Selección y filtrado específico por cada columna de la tabla.</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-end gap-2 px-5 py-3.5 bg-slate-50 border-t border-slate-100">
+                    <button type="button" @click="filterModalOpen = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1908,6 +1946,8 @@
             detailTab: 'general', // 'general' | 'acciones' | 'documentos' | 'eventos' | 'auditoria'
             newHitoModalOpen: false,
             newCaseModalOpen: false,
+            filterModalOpen: false,
+            columnsConfigModalOpen: false,
             submittingNew: false,
             toastVisible: false,
             toastMessage: '',
@@ -2120,6 +2160,19 @@
                         window.lucide.createIcons();
                     }
                 });
+            },
+
+            openFilterModal() {
+                this.filterModalOpen = true;
+                this.$nextTick(() => {
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+                });
+            },
+
+            closeFilterModal() {
+                this.filterModalOpen = false;
             },
 
             resetNewProcesoForm() {
