@@ -10,7 +10,9 @@ const emit = defineEmits<{
     (e: 'finish'): void;
 }>();
 
-const phase = ref<'enter' | 'hold' | 'reveal' | 'done'>(props.show ? 'enter' : 'done');
+const phase = ref<'enter' | 'hold' | 'reveal' | 'done'>(
+    props.show ? 'enter' : 'done',
+);
 const logoVisible = ref(false);
 
 const destTop = ref(0);
@@ -26,8 +28,8 @@ const clearTimers = () => {
 
 const updateDestinationCoordinates = () => {
     if (typeof window === 'undefined') {
-return;
-}
+        return;
+    }
 
     const headerLogo = document.getElementById('header-logo-box');
     const splashLogo = document.querySelector('.splash-logo');
@@ -35,13 +37,14 @@ return;
     if (headerLogo && splashLogo) {
         const headerRect = headerLogo.getBoundingClientRect();
         const splashRect = splashLogo.getBoundingClientRect();
-        
+
         // Target the center of the header logo
         destLeft.value = headerRect.left + headerRect.width / 2;
         destTop.value = headerRect.top + headerRect.height / 2;
-        
+
         // Calculate the scale ratio dynamically based on the rendered width
-        destScale.value = splashRect.width > 0 ? (headerRect.width / splashRect.width) : 0.125;
+        destScale.value =
+            splashRect.width > 0 ? headerRect.width / splashRect.width : 0.125;
     }
 };
 
@@ -113,7 +116,7 @@ onBeforeUnmount(() => {
         >
             <div class="splash-bg absolute inset-0"></div>
 
-            <div class="splash-glow absolute inset-0 pointer-events-none"></div>
+            <div class="splash-glow pointer-events-none absolute inset-0"></div>
 
             <div class="splash-logo-wrap">
                 <div
@@ -121,11 +124,15 @@ onBeforeUnmount(() => {
                     :class="{
                         'is-visible': logoVisible,
                     }"
-                    :style="phase === 'reveal' ? {
-                        top: `${destTop}px`,
-                        left: `${destLeft}px`,
-                        transform: `translate(-50%, -50%) scale(${destScale})`
-                    } : {}"
+                    :style="
+                        phase === 'reveal'
+                            ? {
+                                  top: `${destTop}px`,
+                                  left: `${destLeft}px`,
+                                  transform: `translate(-50%, -50%) scale(${destScale})`,
+                              }
+                            : {}
+                    "
                 >
                     <div
                         class="splash-ring absolute inset-0 -m-6 rounded-full border border-[#c5a059]/30"
@@ -136,7 +143,7 @@ onBeforeUnmount(() => {
                     <img
                         src="/images/logo-splash.png"
                         alt="Sillerico &amp; Asociados"
-                        class="splash-logo relative h-64 w-64 md:h-80 md:w-80 object-contain drop-shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+                        class="splash-logo relative h-64 w-64 object-contain drop-shadow-[0_10px_40px_rgba(0,0,0,0.6)] md:h-80 md:w-80"
                     />
                 </div>
 
@@ -145,7 +152,7 @@ onBeforeUnmount(() => {
                     :class="{ 'is-visible': logoVisible }"
                 >
                     <span
-                        class="font-['Cinzel',serif] text-[#c5a059] text-sm md:text-base font-bold tracking-[0.4em] uppercase"
+                        class="font-['Cinzel',serif] text-sm font-bold tracking-[0.4em] text-[#c5a059] uppercase md:text-base"
                     >
                         Sillerico &amp; Asociados
                     </span>
@@ -153,7 +160,7 @@ onBeforeUnmount(() => {
                         class="splash-line mt-4 h-px bg-gradient-to-r from-transparent via-[#c5a059] to-transparent"
                     ></div>
                     <span
-                        class="mt-4 text-[10px] md:text-xs tracking-[0.5em] uppercase text-amber-200/70 font-light"
+                        class="mt-4 text-[10px] font-light tracking-[0.5em] text-amber-200/70 uppercase md:text-xs"
                     >
                         Firma de Abogados
                     </span>
@@ -194,12 +201,11 @@ onBeforeUnmount(() => {
 }
 
 .splash-glow {
-    background:
-        radial-gradient(
-            circle at 50% 50%,
-            rgba(197, 160, 89, 0.08) 0%,
-            transparent 40%
-        );
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(197, 160, 89, 0.08) 0%,
+        transparent 40%
+    );
     animation: splashGlow 2.4s ease-in-out infinite;
     transform-origin: center;
     opacity: 1;
@@ -277,14 +283,18 @@ onBeforeUnmount(() => {
 .splash-reveal .splash-text {
     opacity: 0 !important;
     transform: translate(-50%, -30%) scale(0.8);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
 }
 
 .splash-ring {
     animation: ringPulse 3s ease-in-out infinite;
     transform-origin: center;
     opacity: 0.6;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
 }
 
 .splash-reveal .splash-ring {

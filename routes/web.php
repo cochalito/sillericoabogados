@@ -10,7 +10,7 @@ Route::get('/', function () {
         ->orderBy('fecha_publicacion', 'desc')
         ->get()
         ->map(function ($item) {
-            $hasFile = !empty($item->archivo_pdf) && $item->getFilePath() !== null;
+            $hasFile = ! empty($item->archivo_pdf) && $item->getFilePath() !== null;
             $fileType = $item->file_type ?: 'PDF';
 
             // Formato de fecha en español
@@ -19,7 +19,7 @@ Route::get('/', function () {
                 $meses = [
                     1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
                     5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
                 ];
                 $dia = $item->fecha_publicacion->format('d');
                 $mes = $meses[(int) $item->fecha_publicacion->format('m')] ?? $item->fecha_publicacion->format('M');
@@ -52,7 +52,7 @@ Route::get('/articulos/{id}/descargar', function (int $id) {
     $articulo = ArticuloLey::findOrFail($id);
     $filePath = $articulo->getFilePath();
 
-    if (!$filePath || !file_exists($filePath)) {
+    if (! $filePath || ! file_exists($filePath)) {
         abort(404, 'El archivo solicitado no se encuentra disponible para descarga.');
     }
 

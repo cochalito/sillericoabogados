@@ -9,8 +9,12 @@ const appName = import.meta.env.VITE_APP_NAME || 'Sillerico & Asociados';
 
 createInertiaApp({
     title: (title) => {
-        if (!title) return appName;
-        return title.includes(appName) || title.toLowerCase().includes('sillerico')
+        if (!title) {
+            return appName;
+        }
+
+        return title.includes(appName) ||
+            title.toLowerCase().includes('sillerico')
             ? title
             : `${title} - ${appName}`;
     },

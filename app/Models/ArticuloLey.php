@@ -37,13 +37,13 @@ class ArticuloLey extends Model
         }
 
         // Ruta en sillerico-sistema (almacenamiento primario)
-        $pathSistema = '/app/sillerico/sillerico-sistema/storage/app/public/' . $this->archivo_pdf;
+        $pathSistema = '/app/sillerico/sillerico-sistema/storage/app/public/'.$this->archivo_pdf;
         if (file_exists($pathSistema)) {
             return $pathSistema;
         }
 
         // Ruta local por fallback si en el futuro se replica
-        $pathLocal = storage_path('app/public/' . $this->archivo_pdf);
+        $pathLocal = storage_path('app/public/'.$this->archivo_pdf);
         if (file_exists($pathLocal)) {
             return $pathLocal;
         }
@@ -61,6 +61,7 @@ class ArticuloLey extends Model
         }
 
         $ext = strtolower(pathinfo($this->archivo_pdf, PATHINFO_EXTENSION));
+
         return strtoupper($ext);
     }
 
@@ -75,9 +76,9 @@ class ArticuloLey extends Model
 
         return $query->where(function ($q) use ($term) {
             $q->where('codigo', 'like', "%{$term}%")
-              ->orWhere('autor', 'like', "%{$term}%")
-              ->orWhere('titulo', 'like', "%{$term}%")
-              ->orWhere('descripcion', 'like', "%{$term}%");
+                ->orWhere('autor', 'like', "%{$term}%")
+                ->orWhere('titulo', 'like', "%{$term}%")
+                ->orWhere('descripcion', 'like', "%{$term}%");
         });
     }
 
