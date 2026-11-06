@@ -332,7 +332,26 @@ const getServiceWhatsappUrl = (serviceTitle: string) => {
   return `${contactLinks.whatsapp}?text=${encodeURIComponent(message)}`;
 };
 
-const publications = ref([
+interface PublicationItem {
+  id?: number;
+  codigo?: string;
+  title: string;
+  date?: string;
+  author?: string;
+  description?: string;
+  category: string;
+  tipo?: string;
+  tipo_label?: string;
+  has_file?: boolean;
+  file_type?: string;
+  pdf?: string | null;
+}
+
+const props = defineProps<{
+  publications?: PublicationItem[];
+}>();
+
+const defaultPublications: PublicationItem[] = [
   {
     title: 'Novedades y Cambios en el Marco Regulatorio Financiero en Bolivia',
     date: '15 de Mayo, 2026',
@@ -389,17 +408,32 @@ const publications = ref([
     category: 'normas',
     pdf: '/files/accion_libertad_constitucional.pdf'
   }
-]);
+];
+
+const publications = computed<PublicationItem[]>(() => {
+  if (props.publications && props.publications.length > 0) {
+    return props.publications;
+  }
+  return defaultPublications;
+});
 
 const currentPage = ref(1);
-const itemsPerPage = 4;
+const itemsPerPage = 6;
 
 const filteredPublications = computed(() => {
+  const keyword = searchKeyword.value.toLowerCase().trim();
+
   return publications.value.filter(pub => {
-    const keyword = searchKeyword.value.toLowerCase();
-    const matchesKeyword = pub.title.toLowerCase().includes(keyword) ||
-                           pub.description.toLowerCase().includes(keyword) ||
-                           pub.author.toLowerCase().includes(keyword);
+    const title = (pub.title || '').toLowerCase();
+    const description = (pub.description || '').toLowerCase();
+    const author = (pub.author || '').toLowerCase();
+    const codigo = (pub.codigo || '').toLowerCase();
+
+    const matchesKeyword = !keyword ||
+                           title.includes(keyword) ||
+                           description.includes(keyword) ||
+                           author.includes(keyword) ||
+                           codigo.includes(keyword);
     
     if (selectedCategory.value === 'todos') {
       return matchesKeyword;
@@ -955,14 +989,24 @@ const galleryImages = [
         <div v-if="paginatedPublications.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div 
             v-for="pub in paginatedPublications" 
-            :key="pub.title"
+            :key="pub.id || pub.codigo || pub.title"
             class="bg-[#0b3629]/60 p-6 md:p-8 rounded-xl border border-[#c5a059]/15 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
           >
             <div class="space-y-4">
-              <!-- Top Row: Author & Date -->
-              <div class="flex justify-between items-center text-[10px] tracking-wider uppercase font-bold text-amber-200/80">
-                <span class="text-[#c5a059]">Por: {{ pub.author }}</span>
-                <span class="bg-[#082a20] text-amber-200 px-2.5 py-0.5 rounded text-[10px] font-semibold">{{ pub.date }}</span>
+              <!-- Top Row: Code Badge, Author & Date -->
+              <div class="flex flex-wrap justify-between items-center gap-2 text-[10px] tracking-wider uppercase font-bold text-amber-200/80">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span 
+                    v-if="pub.codigo"
+                    class="bg-[#c5a059]/20 text-[#e6c987] border border-[#c5a059]/40 px-2 py-0.5 rounded text-[10px] font-mono font-semibold"
+                  >
+                    {{ pub.codigo }}
+                  </span>
+                  <span class="text-[#c5a059]">Por: {{ pub.author }}</span>
+                </div>
+                <span class="bg-[#082a20] text-amber-200 px-2.5 py-0.5 rounded text-[10px] font-semibold border border-[#c5a059]/10">
+                  {{ pub.date }}
+                </span>
               </div>
               
               <!-- Title -->
@@ -971,14 +1015,19 @@ const galleryImages = [
               </h3>
               
               <!-- Description -->
-              <p class="text-xs md:text-sm text-neutral-300 dark:text-neutral-300 font-light leading-relaxed">
+              <p v-if="pub.description" class="text-xs md:text-sm text-neutral-300 dark:text-neutral-300 font-light leading-relaxed">
                 {{ pub.description }}
               </p>
             </div>
 
-            <!-- Bottom Row: Download PDF Button -->
-            <div class="mt-6 pt-4 border-t border-[#c5a059]/15 flex justify-end">
+            <!-- Bottom Row: Download Button or Availability Notice -->
+            <div class="mt-6 pt-4 border-t border-[#c5a059]/15 flex flex-wrap items-center justify-between gap-3">
+              <span class="text-[10px] uppercase tracking-wider text-amber-200/70 font-semibold">
+                {{ pub.tipo_label || (pub.category === 'normas' ? 'Ley / Código' : 'Artículo Doctrinal') }}
+              </span>
+
               <a 
+                v-if="pub.pdf"
                 :href="pub.pdf" 
                 download
                 class="inline-flex items-center gap-2 bg-[#c5a059] hover:bg-[#d6b46c] text-emerald-950 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
@@ -986,8 +1035,16 @@ const galleryImages = [
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                <span>Descargar PDF</span>
+                <span>Descargar {{ pub.file_type || 'Documento' }}</span>
               </a>
+
+              <span 
+                v-else 
+                class="inline-flex items-center gap-1.5 text-xs text-neutral-400 italic bg-[#082a20]/60 px-3 py-1.5 rounded-lg border border-[#c5a059]/10"
+              >
+                <Info class="w-3.5 h-3.5 text-[#c5a059]/60 shrink-0" />
+                <span>Disponible para consulta institucional</span>
+              </span>
             </div>
           </div>
         </div>
