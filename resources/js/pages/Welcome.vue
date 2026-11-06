@@ -694,6 +694,17 @@ const getPartnerWhatsappUrl = (partnerName: string) => {
     return `${contactLinks.whatsapp}?text=${encodeURIComponent(message)}`;
 };
 
+const getPartnerInitials = (name: string): string => {
+    const clean = name.replace(/^(Dr\.|Dra\.)\s+/i, '').trim();
+    const parts = clean.split(/\s+/);
+
+    if (parts.length >= 2) {
+        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+
+    return (parts[0] ? parts[0].slice(0, 2) : 'SA').toUpperCase();
+};
+
 const galleryImages = [
     {
         title: 'Despacho de Presidencia y Dirección General',
@@ -743,7 +754,11 @@ const galleryImages = [
         />
         <meta property="og:type" content="website" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossorigin="anonymous"
+        />
         <link
             href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
             rel="stylesheet"
@@ -1598,7 +1613,7 @@ const galleryImages = [
                                 <span
                                     class="font-['Cinzel',serif] text-5xl font-bold text-[#c5a059]/40 transition-all duration-500 select-none group-hover:scale-105 group-hover:text-[#c5a059] md:text-6xl"
                                 >
-                                    {{ partner.initials }}
+                                    {{ getPartnerInitials(partner.name) }}
                                 </span>
                             </div>
 
@@ -2373,7 +2388,7 @@ const galleryImages = [
                         <iframe
                             src="https://maps.google.com/maps?q=Edificio%20Park%20Inn%20La%20Paz&amp;t=&amp;z=17&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
                             class="h-48 w-full border-0 sm:h-56 md:h-64"
-                            allowfullscreen=""
+                            :allowfullscreen="true"
                             loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"
                         ></iframe>

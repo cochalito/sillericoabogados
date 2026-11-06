@@ -27,3 +27,10 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/Fixture_Mundial_2026.pdf
+/.~lock.*
+/cover.png
+/fixture.html
+/generate_fixture.*
+/test.html
+/test.pdf
